@@ -1,0 +1,51 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Orders{%endblock%}
+{%block heading%}Orders{%endblock%}
+{%block table%} 
+<div class="cart-section mt-150 mb-150">
+	<div class="container">
+        {% for message in messages %}
+                        <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+                        {% endfor %}
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+					<table class="cart-table">
+						<thead class="cart-table-head">
+							<tr class="table-head-row">								
+								<th class="product-image">Order ID</th>
+                                <th class="product-name">Product Name</th>
+                                <th class="product-image">Image</th>
+                                <th class="product-price">Price</th>
+                                <th class="product-quantity">Quantity</th>
+                                <th class="product-remove">Status</th>
+                                <th class="product-remove">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                {% for order_item in order.orderitem_set.all %}
+                                    <tr class="table-body-row">
+                                        <td class="product-image">{{ order.id }}</td>
+                                        <td class="product-name">{{ order_item.product.name }}</td>
+                                        <td class="product-image"><img src="{{order_item.product.image.url}}" alt""></td>
+                                        <td class="product-price">{{ order_item.product.price }}</td>
+                                        <td class="product-quantity">{{ order_item.quantity }}</td>
+                                        <td class="product-remove">{{ order_item.get_status_display }}</td>
+                                        <td>
+                                            {% if order_item.status != 'cancelled' %}
+                                                <a href="/cancelorder/{{ order_item.id }}">Cancel</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+        </div>
+    </div>
+ </div>   
+{%endblock%}

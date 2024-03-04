@@ -1,0 +1,43 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Edit Profile{%endblock%}
+{%block heading%}Edit Profile{%endblock%}
+{%block table%}
+<div class="contact-from-section mt-150 mb-150 d-flex justify-content-center">
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-lg-8 mb-5 mb-lg-0 ">
+                <div id="form_status"></div>
+                <div class="contact-form ">
+                    <form  id="fruitkha-contact" onSubmit="return valid_datas(this);" >
+                        <p>
+                            <a href="/editprofile/" class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/icon8.png' %}" alt=""> Edit Profile</a>
+                            <a class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/address.png' %}" alt=""> Addresses</a>
+                        </p>
+                        <p>
+                            <a class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/order.png' %}" alt=""> Orders</a>
+                            <a class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/coupon.png' %}" alt=""> Coupons</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-form p {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .button-placeholder {
+        width: 48%; /* Adjust as needed */
+        padding: 10px;
+        margin: 0;
+        border: 1px solid black;
+    }
+</style>
+{%endblock%}

@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Orders</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="../../vendors/base/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- inject:css --> 
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="../../images/favicon.png" />
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:../../partials/_navbar.html -->
+    
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_sidebar.html -->
+      
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/adminhome/">
+              <i class="ti-shield menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/usermanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">User Management</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/productmanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/categorymanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Catagories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Return</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Banners</span>
+            </a>
+          </li>
+          <li>
+            <a class="btn btn-danger" href="/logout/">logout</a>
+          </li>
+        </ul>
+   
+      </nav>
+      
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <div>
+                    
+                    <a class="btn btn-secondary float-right" href="/addproduct/">+ Add Product</a>
+
+                  </div>
+                   <!-- <div class="table-responsive">
+                    <table class="table table-bordered"> -->
+                      <div class="table-responsive">
+                        <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Order id</th>
+                          <th>User</th>
+                          <th>Product</th>                          
+                          <th>Quantity</th>
+                          <th>Payment</th>
+                          <th>Image</th>
+                          <th>Amount</th>
+                          <th>Status</th>                           
+                        </tr>
+                      </thead>
+                      <tbody>
+                     
+                      {% for order_item in orders %}
+                        <tr>
+                          <td>{{ order_item.order.id }}</td>
+                          <td>{{ order_item.order.user.username }}</td>
+                          <td>{{ order_item.product.name }}</td>
+                          <td>{{ order_item.quantity }}</td>
+                          <td>{{ order_item.order.payment_method }}</td>
+                          <td><img src="{{ order_item.product.image.url }}" alt="Product Image" style="width: 50px; height: 50px;"></td>
+                          <td>{{ order_item.calculate_amount }}</td>
+                          <td>
+                            <!-- {{ order_item.get_status_display }} -->
+                            <form method="post" action="{% url 'orderstatus' order_item.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <select name="status" onchange="this.form.submit()">
+                                    <option value="pending" {% if 'pending' == order_item.status %}selected{% endif %}>Pending</option>
+                                    <option value="shipped" {% if 'shipped' == order_item.status %}selected{% endif %}>Shipped</option>
+                                    <option value="cancelled" {% if 'cancelled' == order_item.status %}selected{% endif %}>Cancel</option>
+                                    <option value="delivered" {% if 'delivered' == order_item.status %}selected{% endif %}>Delivered</option>
+                                </select>
+                            </form>
+                        </td>
+                        </tr>
+                      {% endfor %}                      
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+        <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <i class="ti-heart text-danger ml-1"></i></span>
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="../../vendors/base/vendor.bundle.base.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <!-- End custom js for this page-->
+</body>
+
+</html>
+
+

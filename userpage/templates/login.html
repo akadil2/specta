@@ -1,0 +1,40 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Login{%endblock%}
+{%block heading%}Login{%endblock%}
+{%block table%}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 offset-md-4">
+                <div class="login-form bg-light mt-4 p-4">
+                    <form action="" method="post" class="row g-3">
+                        {%csrf_token%}
+                        <!-- <h4>Please login to enter Home </h4> -->
+                        <div class="col-12">
+                            <label>Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Username">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label>Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Password">
+                        </div>
+                        
+                        <div class="col-12">
+                            {% for message in messages %}
+                        <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+                        {% endfor %}
+                            <button type="submit" class="btn btn-dark float-end" style="margin-top: 5px;">Login</button>
+                        </div>
+                    </form>
+                    <hr class="mt-4">
+                    <div class="col-12">
+                        <p class="text-center mb-0"><a href="">Forgot Password?</a></p>
+                        <p class="text-center mb-0">New User? <a href="/signup/">Signup</a></p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endblock%}

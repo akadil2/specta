@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>User management</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="../../vendors/base/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- inject:css --> 
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="../../images/favicon.png" />
+</head>
+
+<body>
+  <div class="container-scroller">
+  
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_sidebar.html -->
+      
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/adminhome/">
+              <i class="ti-shield menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/usermanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">User Management</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/productmanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/categorymanage/">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Catagories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Return</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="basic-table.html">
+              <i class="ti-view-list-alt menu-icon"></i>
+              <span class="menu-title">Banners</span>
+            </a>
+          </li>
+          <li>
+            <a class="btn btn-danger" href="/logout/">logout</a>
+          </li>
+        </ul>
+   
+      </nav>
+      
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col-lg-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <!-- <h4 class="card-title">Customers</h4> -->
+                  <div class="row">
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+                  </div>
+                </div>
+                  <p class="card-description">
+                    
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Username</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for i in cust%}
+                        <tr>
+                          <td>{{i.username}}</td>
+                          <td>{{i.email}}</td>
+                          <td>{{i.phone_number}}</td>
+                          <td>
+                           
+                              <a class="btn btn-secondary btn-sm" href="/userstatus/{{i.id}}">
+                                {% if i.is_blocked %}
+                                  Unblock
+                                {% else %}
+                                  Block
+                                {% endif %}
+                              </a>
+                            <!-- </form> -->
+                          </td>
+                        </tr>
+                        {% endfor %}
+                        
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+        <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <i class="ti-heart text-danger ml-1"></i></span>
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="../../vendors/base/vendor.bundle.base.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
+  <!-- End custom js for this page-->
+</body>
+
+</html>

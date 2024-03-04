@@ -1,0 +1,78 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Profile{%endblock%}
+{%block heading%}Profile{%endblock%}
+{%block table%}
+<div class="contact-from-section mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="form-title">
+                    {% for message in messages %}
+                        <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+                        {% endfor %}
+                    <h2>Hai {{user.username}}</h2>
+                    <p><strong>You can edit your info here:</strong></p>
+                </div>
+                 <div id="form_status"></div>
+                 <div class="contact-form">
+                    <form method="POST" action="" id="fruitkha-contact">
+                        {% csrf_token %}                        
+                     
+                        <div class="form-group">
+                            <label for="name">First Name:</label>
+                            <input type="text" value="{{user.first_name}}" name="fname" id="name">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="email">Last Name:</label>
+                            <input type="text" value="{{user.last_name}}" name="lname" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Username:</label>
+                            <input type="text" value="{{user.username}}" name="uname" id="subject">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="phone">Phone No:</label>
+                            <input type="tel" value="{{user.phone_number}}" name="phone" id="phone">
+                        </div>                                   
+                        <!-- <p><input type="submit" value="Update"></p> -->
+                        <button type="submit" class="btn btn-primary mr-2">Edit profile</button>
+                    </form>
+                 </div>
+                </div>
+            <div class="col-lg-4">
+                <div class="contact-form-wrap">
+                    <div class="contact-form-box">
+                        <a href="/address/" class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/address.png' %}" alt=""> Addresses</a> 
+                    </div>
+                    <div class="contact-form-box">
+                        <a href="/vieworders/" class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/order.png' %}" alt=""> Orders</a>
+                        
+                    </div>
+                    <div class="contact-form-box">
+                        <a href="/changepassword/" class="button-placeholder text-center" id="nameBtn">Change Password</a>
+                        
+                    </div>
+                    <div class="contact-form-box">
+                        <!-- <a class="button-placeholder text-center" id="nameBtn"><img src="{% static 'img/coupon.png' %}" alt=""> Coupons</a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+ 
+    .button-placeholder {
+        width: 48%; 
+        padding: 10px;
+        margin: 0;
+        border: 1px solid black;
+    }
+</style>
+{%endblock%}
+
+<!-- contact form 
+

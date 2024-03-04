@@ -1,0 +1,32 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Login{%endblock%}
+{%block heading%}Login{%endblock%}
+{%block table%}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 offset-md-4">
+                <div class="login-form bg-light mt-4 p-4">
+                    <form action="" method="post" class="row g-3">
+                        {%csrf_token%}
+                        <!-- <h4>Please login to enter Home </h4> -->
+                        <div class="col-12">
+                            <label>OTP</label>
+                            <input type="text" name="otp" class="form-control" placeholder="enter otp">
+                        </div>
+                        
+                        
+                        <div class="col-12">
+                            {% for message in messages %}
+                        <h6 style="color: red;">{{message}} </h6>
+                        {% endfor %}
+                            <button type="submit" class="btn btn-dark float-end" style="margin-top: 5px;">Submit</button>
+                        </div>
+                    </form>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endblock%}

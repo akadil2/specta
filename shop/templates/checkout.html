@@ -1,0 +1,161 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Checkout{%endblock%}
+{%block heading%}Checkout{%endblock%}
+{%block table%}
+<style>
+    /* Add this style block in the head section or your CSS file */
+    .cart-form {
+        display: inline-block; /* Ensures the button takes only the necessary width */
+    }
+
+    .cart-btn {
+        background-color: orange;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px; /* Rounded edges */
+        cursor: pointer;
+    }
+
+    .cart-btn:hover {
+        background-color: darkorange; /* Change color on hover */
+    }
+</style>
+
+<div class="cart-section mt-150 mb-150">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+					<table class="cart-table">
+						<thead class="cart-table-head">
+							<tr class="table-head-row">								
+								<th class="product-image">Product Image</th>
+								<th class="product-name">Name</th>
+								<th class="product-price">Price</th>
+								<th class="product-quantity">Quantity</th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in cart %}
+							<tr class="table-body-row">                            
+								<td class="product-image"><img src="{{item.product.image.url}}" alt=""></td>
+								<td class="product-name">{{item.product.name}}</td>
+								<td class="product-price">{{item.product.price}}</td>
+								<td class="product-quantity">{{item.quantity}}</td>
+								
+							</tr>
+							{%endfor%}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="col-lg-4">
+				<div class="total-section">
+					<table class="total-table">
+						<thead class="total-table-head">
+							<tr class="table-total-row">
+								<th>Total Price</th>
+								<!-- <th>Price</th> -->
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="total-data">
+								
+								<td>₹{{total_amount}}</td>
+							</tr>
+							
+						</tbody>
+					</table>
+                    
+					<div class="cart-buttons">
+					   <!-- <a href="checkout.html" class="boxed-btn black">Check Out</a> -->
+					</div>
+				</div>
+
+				
+			</div>
+		</div>
+	</div>
+</div>    
+<div class="cart-section mt-150 mb-150">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+                    <form method="post" action="{% url 'processorder'  %}">
+                        {% csrf_token %}
+                    
+                        <!-- Address Table -->
+                        <table class="cart-table">
+                            <thead class="cart-table-head">
+                                <tr class="table-head-row">
+                                    <th class="product-image">Select Address</th>
+                                    <th class="product-name">Address</th>
+                                    <th class="product-price">Pin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for addres in addres %}
+                                    <tr class="table-body-row">
+                                        <td class="product-remove">
+                                            <input type="checkbox" name="selected_address" value="{{ addres.id }}">
+                                        </td>
+                                        <td class="product-price">{{ addres.house_name }}</td>
+                                        <td class="product-quantity">{{ addres.pin_code }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    
+                        <!-- Payment Option Table -->
+                        <table class="total-table">
+                            <thead class="total-table-head">
+                                <tr class="table-total-row">
+                                    <th>Payment Option</th>
+                                </tr>
+                            </thead>
+                            
+                                <div class="col-lg-4">
+                                    <div class="total-section">
+                                        <tbody>
+                                     <tr class="total-data">
+                                       <td>
+                                        <!-- Assuming you want to allow users to select a payment method -->
+                                           <select name="payment_method">
+                                            <option value="COD">Cash on Delivery (COD)</option>
+                                            <!-- Add more payment options as needed -->
+                                        </select>
+                                       </td>
+                                     </tr>
+                              </tbody>
+                            </table>
+                    
+                        <div class="cart-buttons">
+                            <!-- <button type="submit" class="boxed-btn black">Place Order</button> -->
+							<button type="submit" class="cart-btn"><i class="fas fa-shopping-cart"></i>Place Order</button>
+                        </div>
+                    </form>
+                    
+					
+					
+				</div>
+
+				
+			</div>
+		</div>
+	</div>
+</div>    
+	
+{%endblock%}
+
+
+	
+	

@@ -1,0 +1,99 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Addresses{%endblock%}
+{%block heading%}Addresses{%endblock%}
+{%block table%}
+<style>
+    .billing-address-form form {
+        max-width: 400px; /* Adjust the maximum width as needed */
+        margin: auto; /* Center the form */
+    }
+
+    .billing-address-form label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .billing-address-form input,
+    .billing-address-form textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+    }
+
+    .billing-address-form button {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+    }
+</style>
+<div class="checkout-section mt-150 mb-150">
+    <div class="container"> 
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-accordion-wrap">
+                    {% for i in addres %}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                {{ i.house_name }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="billing-address-form">
+                                <form action="{% url 'editaddress' ad_id=i.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="name">Name:</label>
+                                        <input type="text" name="name" value="{{ i.name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="house_name">House name:</label>
+                                        <input type="text" name="house_name" value="{{ i.house_name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone:</label>
+                                        <input type="text" name="phone" value="{{ i.phone }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City:</label>
+                                        <input type="text" name="city" value="{{ i.city }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="post">Post:</label>
+                                        <input type="text" name="post" value="{{ i.post }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pin_code">Pin:</label>
+                                        <input type="text" name="pin_code" value="{{ i.pin_code }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State:</label>
+                                        <input type="text" name="state" value="{{ i.state }}" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Edit Address</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <div class="col-lg-4">
+                <div class="order-details-wrap">                    
+                    <a href="/newaddress/" class="boxed-btn">Add an Address</a><br>
+                    <a href="/userprofile/" class="boxed-btn">Go to Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

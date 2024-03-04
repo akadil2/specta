@@ -1,0 +1,99 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Product Detais{%endblock%}
+{%block heading%}Shop{%endblock%}
+{%block table%}
+<style>
+    .small-image {
+        width:  100px; 
+        height: auto;
+         
+    }
+</style>
+<style>
+    /* Add this style block in the head section or your CSS file */
+    .cart-form {
+        display: inline-block; /* Ensures the button takes only the necessary width */
+    }
+
+    .cart-btn {
+        background-color: orange;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px; /* Rounded edges */
+        cursor: pointer;
+    }
+
+    .cart-btn:hover {
+        background-color: darkorange; /* Change color on hover */
+    }
+</style>
+
+<!-- single product -->
+<div class="single-product mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="single-product-img">
+                    {% if item.image %}
+                        <img id="mainImage" src="{{ item.image.url }}" alt="{{ item.name }}">
+                    {% endif %}
+                </div>
+                
+                <!-- Display smaller images below the main image -->
+                <div class="small-images">
+                    <a href="#" onclick="changeMainImage(event,'{{ item.image.url }}')">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}-1" class="small-image">
+                        {% endif %}
+                    </a>
+                    <a href="#" onclick="changeMainImage(event,'{{ item.image1.url }}')">
+                        {% if item.image1 %}
+                            <img src="{{ item.image1.url }}" alt="{{ item.name }}-1" class="small-image">
+                        {% endif %}
+                    </a>
+                    <a href="#" onclick="changeMainImage(event,'{{ item.image2.url }}')">
+                        {% if item.image2 %}
+                            <img src="{{ item.image2.url }}" alt="{{ item.name }}-2" class="small-image">
+                        {% endif %}
+                    </a>
+                </div>
+                
+                
+            </div>
+            
+            <div class="col-md-7">
+                <div class="single-product-content">
+                    <h3>{{ item.name }}</h3>
+                    <p class="single-product-pricing">₹{{ item.price }}</p> 
+                    <p>{{ item.description }}</p>
+                    <p>Stock Available:{{item.stock}}</p>
+                    <div class="single-product-form">
+                        <form action="{% url 'addtocart' product_id=item.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" placeholder="1" min="1" max="{% if item.stock and item.stock < 5 %}{{ item.stock }}{% else %}5{% endif %}">
+                            <button type="submit" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                        </form>
+                            
+                        <p><strong>Category: </strong>{{ item.category.name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+</div>
+<script>
+    function changeMainImage(event, imageUrl) {
+        event.preventDefault();
+        document.getElementById('mainImage').src = imageUrl;
+    }
+</script>
+{%endblock%}
+<!-- end single product -->

@@ -1,0 +1,45 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Addresses{%endblock%}
+{%block heading%}Addresses{%endblock%}
+{%block table%}
+<div class="contact-from-section mt-150 mb-150">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mb-5 mb-lg-0">
+                <div class="form-title">
+                    <h2>Enter new Address here</h2>
+                    
+                </div>
+                <div id="form_status"></div>
+                <div class="contact-form">
+                    <form method="POST" action="" id="fruitkha-contact">
+                        {% csrf_token %}
+                        <p>
+                            <input type="text" placeholder="Name" name="name" id="name">
+                            <input type="text" placeholder="House/office Name" name="house" id="email">
+                        </p>
+                        <p>
+                            <input type="tel" placeholder="Phone" name="phone" id="phone">
+                            <input type="text" placeholder="Place" name="place" id="subject">
+                        </p>
+                        <p>
+                            <input type="text" placeholder="City" name="city" id="name">
+                            <input type="text" placeholder="Pincode" name="pin" id="email">
+                        </p>
+                        <p>
+                            <input type="text" placeholder="State" name="state" id="name"> 
+                        </p>
+                        <button type="submit" class="btn btn-primary mr-2">Add</button>
+                        <a class="btn btn-secondary" href="/checkout/">Cancel</a>                        
+                    </form>
+                </div>
+                
+                    
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
+{%endblock%}

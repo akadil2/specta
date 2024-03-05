@@ -34,7 +34,7 @@
                                         <td class="product-quantity">{{ order_item.quantity }}</td>
                                         <td class="product-remove">{{ order_item.get_status_display }}</td>
                                         <td>
-                                            {% if order_item.status != 'cancelled' %}
+                                            {% if order_item.status != 'cancelled' and order_item.status != 'delivered' %}
                                                 <a href="/cancelorder/{{ order_item.id }}">Cancel</a>
                                             {% endif %}
                                         </td>
@@ -43,6 +43,9 @@
                             {% endfor %}
 						</tbody>
 					</table>
+                    <div class="cart-buttons">
+						<a href="/allproducts/" class="boxed-btn">Continue Shopping</a>						
+					</div>
 				</div>
 			</div>
         </div>

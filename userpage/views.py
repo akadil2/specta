@@ -37,11 +37,8 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
         
-        user = authenticate(request, username=username, password=password)
-        print(user)
-        
+        user = authenticate(request, username=username, password=password)        
 
         if user is not None and isinstance(user, Customer):
             if user.is_superuser:                
@@ -225,10 +222,10 @@ def newAddress(request):
 
     return render(request,'newaddress.html')
 
-from django.contrib.auth import authenticate
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.contrib.auth import update_session_auth_hash
+def deleteAddress(request,ad_id):
+    adress = Address.objects.filter(pk=ad_id).delete()
+    messages.success(request, 'Address deleted')
+    return redirect('address')
 
 def changePassword(request):
     if request.method == 'POST':

@@ -29,71 +29,106 @@
         border: none;
         cursor: pointer;
     }
+   
+
+.custom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.button-text {
+    margin-right: 100px;
+    text-decoration: none;
+   
+}
+
+.icon {
+    font-size: 18px; /* Adjust the size of the icon */
+    color: #007bff; /* Set the color of the icon */
+    text-decoration: none;
+}
 </style>
+
+
 <div class="checkout-section mt-150 mb-150">
     <div class="container"> 
         <div class="row">
             <div class="col-lg-8">
                 <div class="checkout-accordion-wrap">
-                    {% for i in addres %}
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                {{ i.house_name }}
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="billing-address-form">
-                                <form action="{% url 'editaddress' ad_id=i.id %}" method="post">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                        <label for="name">Name:</label>
-                                        <input type="text" name="name" value="{{ i.name }}" required>
+                    <div class="accordion" id="accordionExample">
+                        {% for i in addres %}
+                        <div class="card mb-3">
+                            <div class="card-header" id="heading{{ i.id }}">
+                                <h5 class="mb-0">
+                                    {% for message in messages %}
+                                    <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+                                     {% endfor %}
+                                     <button class="btn btn-link custom-btn" type="button" data-toggle="collapse" data-target="#collapse{{ i.id }}" aria-expanded="true" aria-controls="collapse{{ i.id }}">
+                                        <span class="button-text">Address:{{ i.house_name }} Pin:{{ i.pin_code }}</span>
+                                        <i class="fas fa-chevron-down icon">Edit/Delete</i>
+                                    </button>
+                                    
+                                </h5>
+                            </div>
+                            <div id="collapse{{ i.id }}" class="collapse" aria-labelledby="heading{{ i.id }}" data-parent="#accordionExample">
+                                <div class="card-body">
+                                    <div class="billing-address-form">
+                                        <form action="{% url 'editaddress' ad_id=i.id %}" method="post">
+                                            {% csrf_token %}
+                                            <!-- Your form fields here -->
+                                            <div class="form-group">
+                                                <label for="name">Name:</label>
+                                                <input type="text" name="name" value="{{ i.name }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="house_name">House name:</label>
+                                                <input type="text" name="house_name" value="{{ i.house_name }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="phone">Phone:</label>
+                                                <input type="text" name="phone" value="{{ i.phone }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="city">City:</label>
+                                                <input type="text" name="city" value="{{ i.city }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="post">Post:</label>
+                                                <input type="text" name="post" value="{{ i.post }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="pin_code">Pin:</label>
+                                                <input type="text" name="pin_code" value="{{ i.pin_code }}" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="state">State:</label>
+                                                <input type="text" name="state" value="{{ i.state }}" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary mr-2">Edit Address</button>
+                                            <a href="/deleteaddress/{{i.id}}" class="btn btn-danger btn-lg">Delete</a>
+                                        </form>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="house_name">House name:</label>
-                                        <input type="text" name="house_name" value="{{ i.house_name }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="phone">Phone:</label>
-                                        <input type="text" name="phone" value="{{ i.phone }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="city">City:</label>
-                                        <input type="text" name="city" value="{{ i.city }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="post">Post:</label>
-                                        <input type="text" name="post" value="{{ i.post }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="pin_code">Pin:</label>
-                                        <input type="text" name="pin_code" value="{{ i.pin_code }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="state">State:</label>
-                                        <input type="text" name="state" value="{{ i.state }}" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary mr-2">Edit Address</button>
-                                </form>
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-
             <div class="col-lg-4">
                 <div class="order-details-wrap">                    
-                    <a href="/newaddress/" class="boxed-btn">Add an Address</a><br>
+                    <a href="/newaddress/" class="boxed-btn">Add an Address</a>
                     <a href="/userprofile/" class="boxed-btn">Go to Profile</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
 {%endblock%}

@@ -62,8 +62,8 @@
 						<nav class="main-menu">
 							<ul>
 								<li class="current-list-item"><a href="/home/">Home</a></li>
-								<li><a href="about.html">About</a></li>								
-								<li><a href="contact.html">Contact</a></li>
+								<li><a href="">About</a></li>								
+								<li><a href="">Contact</a></li>
 								<li><a href="/allproducts/">Shop</a></li> 
 								
 								{% if request.user.is_authenticated %}    
@@ -81,10 +81,7 @@
 									<div class="header-icons">
 										<a class="shopping-cart" href="/viewcart/"><i class="fas fa-shopping-cart"></i></a>
 										<a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-search"></i></a>
-										<!-- <form method="get" action="{% url 'productsearch' %}">
-											<input type="text" name="query" placeholder="Search products" value="{{ query }}">
-											<button type="submit">Search</button>
-										</form> -->
+										
 									</div>
 								</li>
 							</ul>
@@ -121,10 +118,7 @@
 						<button type="submit">Search <i class="fas fa-search"></i></button>
 					</form>
                   
-                    <!-- <form method="get" action="{% url 'productsearch' %}">
-                        <input type="text" name="query" placeholder="Search products" value="{{ query }}">
-                        <button type="submit">Search <i class="fas fa-search"></i></button>
-                    </form> -->
+                    
                     
                 </div>
             </div>

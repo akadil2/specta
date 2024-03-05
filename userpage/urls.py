@@ -14,6 +14,7 @@ urlpatterns = [
     path('address/',views.userAddress, name='address'),
     path('newaddress/',views.newAddress, name='newaddress'),
     path('editaddress/<int:ad_id>',views.editAddress, name='editaddress'),
+    path('deleteaddress/<int:ad_id>',views.deleteAddress, name='deleteaddress'),
     path('changepassword/',views.changePassword, name='changepassword')
 
     

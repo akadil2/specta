@@ -1,8 +1,25 @@
 {%extends 'base.html'%}
 {% load static %}
-{%block title%}Checkout{%endblock%}
-{%block heading%}Checkout{%endblock%}
+{%block title%}Success{%endblock%}
+{%block heading%}Success!!{%endblock%}
 {%block table%}
-
-
+<!-- error section -->
+<div class="full-height-section error-section">
+    <div class="full-height-tablecell">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center">
+                    <div class="error-text">
+                        <i class="far fa-check-circle text-success"></i>
+                        <h1>Order Placed successfully!! </h1>
+                        <p>Go to Orders to see your Order</p>
+                        <a href="/vieworders/" class="boxed-btn">Orders</a>
+                        <a href="/allproducts/" class="boxed-btn">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end error section -->
 {%endblock%}

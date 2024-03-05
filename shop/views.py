@@ -35,10 +35,11 @@ def singleProduct(request,item_id):
 
 #cart view# 
 def addtoCart(request, product_id):
-    product = Product.objects.get(pk=product_id)
-    user = request.user
+    if request.user.is_authenticated:
+     product = Product.objects.get(pk=product_id)
+     user = request.user
 
-    if request.method == 'POST':
+     if request.method == 'POST':
         quantity_str = request.POST.get('quantity', '1')
 
         if quantity_str.strip():
@@ -57,16 +58,17 @@ def addtoCart(request, product_id):
         
         return redirect('viewcart')
 
-    return render(request, 'singleproduct.html', {'product': product})
+    return redirect('login')
 
-def viewCart(request):    
-    user = request.user
-    cart = Cart.objects.filter(user=user)
-    total_amount = sum(item.product.price * item.quantity for item in cart)
-    context = {'cart':cart,'total_amount':total_amount}
+def viewCart(request):
+    if request.user.is_authenticated:    
+        user = request.user
+        cart = Cart.objects.filter(user=user)
+        total_amount = sum(item.product.price * item.quantity for item in cart)
+        context = {'cart':cart,'total_amount':total_amount}
 
-
-    return render(request, 'cart.html', context)
+        return render(request, 'cart.html', context)
+    return redirect('login')
 
 def deleteCartItem(requst,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
@@ -85,6 +87,24 @@ def checkOut(request):
         return redirect('viewcart')
 
     return render(request, 'checkout.html', context)
+
+def addnewAddress(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        hname = request.POST.get('house')        
+        phone = request.POST.get('phone')
+        post = request.POST.get('place')
+        city = request.POST.get('city')
+        pincode = request.POST.get('pin')
+        state = request.POST.get('state')
+        user = request.user
+        
+        adress = Address.objects.create(user=user,name=name,house_name=hname,phone=phone,post=post,city=city,pin_code=pincode,state=state)
+        adress.save()
+        return redirect('checkout')
+            
+
+    return render(request,'addnewaddress.html')
 
 
     
@@ -113,16 +133,14 @@ def processOrder(request):
         order.address = selected_address
         order.save()
 
-        Cart.objects.filter(user=user).delete()
-
+        Cart.objects.filter(user=user).delete()        
         
-        messages.success(request, 'Your order has been placed successfully!')
-        return redirect('vieworders')
+        return redirect('ordersuccess')
 
-    # Handle cases where the request method is not POST
-    # ...
+    return render(request, 'checkout.html') 
 
-    return render(request, 'checkout.html')    
+def orderSuccess(request):
+    return render(request,'ordersuccess.html')   
 
 def viewOrders(request):
     user = request.user

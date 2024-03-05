@@ -3,6 +3,8 @@
 {%block title%}Product Detais{%endblock%}
 {%block heading%}Shop{%endblock%}
 {%block table%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <style>
     .small-image {
         width:  100px; 
@@ -32,6 +34,27 @@
     .cart-btn:hover {
         background-color: darkorange; /* Change color on hover */
     }
+    .single-product-img {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .magnify {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        border: 2px solid #000;
+        cursor: none;
+        display: none;
+        background-size: 200% 200%;
+    }
+
+    .single-product-img img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.2s ease-in-out;
+    }
 </style>
 
 <!-- single product -->
@@ -43,8 +66,8 @@
                     {% if item.image %}
                         <img id="mainImage" src="{{ item.image.url }}" alt="{{ item.name }}">
                     {% endif %}
-                </div>
-                
+                    <div class="magnify"></div>                    
+                </div>                
                 <!-- Display smaller images below the main image -->
                 <div class="small-images">
                     <a href="#" onclick="changeMainImage(event,'{{ item.image.url }}')">
@@ -95,5 +118,37 @@
         document.getElementById('mainImage').src = imageUrl;
     }
 </script>
+<script>
+    $(document).ready(function () {
+        $(".single-product-img").mousemove(function (e) {
+            var magnifyGlass = $(this).children(".magnify");
+            var image = $(this).children("img");
+
+            var offsetX = e.pageX - $(this).offset().left - magnifyGlass.width() / 2;
+            var offsetY = e.pageY - $(this).offset().top - magnifyGlass.height() / 2;
+
+            magnifyGlass.css({
+                "left": offsetX,
+                "top": offsetY,
+                "display": "block"
+            });
+
+            image.css({
+                "transform-origin": (offsetX + magnifyGlass.width() / 2) + "px " + (offsetY + magnifyGlass.height() / 2) + "px"
+            });
+
+            image.css({
+                "transform": "scale(2)"
+            });
+        });
+
+        $(".single-product-img").mouseout(function () {
+            $(this).children(".magnify").hide();
+            $(this).children("img").css("transform", "scale(1)");
+        });
+    });
+</script>
+
+
 {%endblock%}
 <!-- end single product -->

@@ -31,6 +31,9 @@ class Cart(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
+    def calculate_total_amount(self):
+        return self.product.price * self.quantity
+
     def __str__(self):
         return self.user.username
 
@@ -71,3 +74,26 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f'Order #{self.pk} by {self.user.username}'
+    
+class Wishlist(models.Model):
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    
+
+    def __str__(self):
+        return self.user.username
+    
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount_amount = models.PositiveIntegerField(default=100)
+    min_orderamount = models.PositiveIntegerField(default=500)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+
+    def is_valid(self):
+        from django.utils import timezone
+        now = timezone.now()
+        return self.valid_from <= now <= self.valid_to
+
+    def __str__(self):
+        return self.code

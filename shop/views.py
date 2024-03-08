@@ -1,10 +1,13 @@
 from django.shortcuts import render,redirect
-from shop.models import Product,Category,Cart,Order,OrderItem
+from shop.models import Product,Category,Cart,Order,OrderItem,Wishlist,Coupon
 from userpage.models import Address
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
+import razorpay
+from django.http import JsonResponse
 
 
+#all product view
 def allProducts(request):
     prod_list = Product.objects.all()
     paginator = Paginator(prod_list, 6) 
@@ -25,7 +28,7 @@ def allProducts(request):
     }
     return render(request, 'allproducts.html', context)
 
-#single product view#
+#single product view
 def singleProduct(request,item_id):
     item = Product.objects.get(pk=item_id)
     context = {
@@ -33,7 +36,47 @@ def singleProduct(request,item_id):
     }
     return render(request,'singleproduct.html',context)
 
-#cart view# 
+#wishlist view
+def viewWishlist(request):
+    if request.user.is_authenticated:    
+        user = request.user
+        wishlist = Wishlist.objects.filter(user=user)        
+        context = {'wishlist':wishlist,}
+
+        return render(request, 'wishlist.html', context)
+    return redirect('login')
+ 
+
+
+def addtoWishlist(request, product_id):
+    if request.user.is_authenticated:
+        product = Product.objects.get(pk=product_id)
+        user = request.user
+
+        if request.method == 'POST':
+            # Check if the product is already in the wishlist
+            if Wishlist.objects.filter(user=user, product=product).exists():
+                message = 'Product is already in the wishlist.'
+            else:
+                # Add the product to the wishlist
+                Wishlist.objects.create(user=user, product=product)
+                message = 'Product added to the wishlist.'
+
+            # Return a JSON response with the success message
+            return JsonResponse({'message': message})
+        else:
+            # Handle cases where the request method is not POST
+            return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+    # Add a message for unauthenticated users
+    messages.error(request, 'Please log in to add products to your wishlist.')
+    return redirect('login')
+
+def deleteWishlist(requst,product_id):
+    item = Wishlist.objects.filter(pk=product_id).delete()
+    return redirect('wishlist')
+
+#view for adding product to cart 
 def addtoCart(request, product_id):
     if request.user.is_authenticated:
      product = Product.objects.get(pk=product_id)
@@ -60,18 +103,47 @@ def addtoCart(request, product_id):
 
     return redirect('login')
 
-def viewCart(request):
+# def viewCart(request): 
+#     if request.user.is_authenticated:    
+#         user = request.user
+#         cart = Cart.objects.filter(user=user)
+#         total_amount = sum(item.calculate_total_amount() for item in cart)
+#         context = {'cart': cart, 'total_amount': total_amount}
+
+#         return render(request, 'cart.html', context)
+#     return redirect('login')
+
+def viewCart(request): 
     if request.user.is_authenticated:    
         user = request.user
         cart = Cart.objects.filter(user=user)
-        total_amount = sum(item.product.price * item.quantity for item in cart)
-        context = {'cart':cart,'total_amount':total_amount}
+        total_amount = sum(item.calculate_total_amount() for item in cart)
 
+        # Check if a coupon code is provided in the request
+        coupon_code = request.POST.get('coupon')
+        if coupon_code:
+            try:
+                # Get the coupon based on the provided code
+                coupon = Coupon.objects.get(code=coupon_code)
+
+                # Check if the coupon is valid
+                if coupon.is_valid() and total_amount >= coupon.min_orderamount:
+                    # Apply the coupon discount to the total amount
+                    total_amount -= coupon.discount_amount
+            except Coupon.DoesNotExist:
+                # Handle the case where the coupon code is invalid
+                messages.warning(request, 'Invalid coupon code.')
+
+        context = {'cart': cart, 'total_amount': total_amount}
         return render(request, 'cart.html', context)
+    
     return redirect('login')
 
-def deleteCartItem(requst,item_id):
+def deleteCartItem(reqeust,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
+    return redirect('viewcart')
+
+def applyCoupon(request):
     return redirect('viewcart')
 
 def checkOut(request):    
@@ -117,18 +189,18 @@ def processOrder(request):
         selected_address_id = request.POST.get('selected_address')
         payment_method = request.POST.get('payment_method')
 
-        # Create an order instance and save it to the database
+        if not selected_address_id:
+            messages.error(request, "Please select an address.")
+            return redirect('checkout')         
+        
         order = Order.objects.create(user=user, total_price=total_amount, payment_method=payment_method)
-
-        # Create order items for each product in the cart
+        
         for cart_item in cart_items:
             OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
-
-            # Reduce the stock of the product
+            
             cart_item.product.stock -= cart_item.quantity
             cart_item.product.save()
-
-        # Additional logic for saving the selected address to the order
+        
         selected_address = Address.objects.get(pk=selected_address_id)
         order.address = selected_address
         order.save()
@@ -139,12 +211,46 @@ def processOrder(request):
 
     return render(request, 'checkout.html') 
 
+def razorpayOrder(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    total_amount = sum(item.product.price * item.quantity for item in cart_items)
+
+    if request.method == 'POST':
+        selected_address_id = request.POST.get('selected_address')
+        payment_method = request.POST.get('payment_method')
+        client = razorpay.Client(auth=("rzp_test_wtY6GWGahBxiu9", "DYOIyhDEEQYis7V5nVo2IeB7"))
+        data = { "amount": total_amount*100, "currency": "INR", "receipt": '1' }
+        payment = client.order.create(data=data)
+
+        if not selected_address_id:
+            messages.error(request, "Please select an address.")
+            return redirect('checkout')
+        
+        order = Order.objects.create(user=user, total_price=total_amount, payment_method=payment_method)
+       
+        for cart_item in cart_items:
+            OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
+          
+            cart_item.product.stock -= cart_item.quantity
+            cart_item.product.save()
+        
+        selected_address = Address.objects.get(pk=selected_address_id)
+        order.address = selected_address
+        order.save()
+
+        Cart.objects.filter(user=user).delete()        
+        
+        return redirect('ordersuccess')
+
+    return render(request, 'checkout.html')
+
 def orderSuccess(request):
     return render(request,'ordersuccess.html')   
 
 def viewOrders(request):
     user = request.user
-    orders = Order.objects.filter(user=user)
+    orders = Order.objects.filter(user=user).order_by('-id')
     
     context = {'orders': orders}
     return render(request, 'orders.html', context)
@@ -159,30 +265,14 @@ def cancelOrder(request,item_id):
 from django.shortcuts import render
 from .models import Product
 
-# def productSearch(request):
-#     query = request.GET.get('query')
-#     products_list = Product.objects.all()
-#     categories = Category.objects.filter(is_listed=True)
 
-#     if query:
-#         products_list = products_list.filter(name__icontains=query)
-
-#     context = {
-#         'query': query,
-#         'products': products_list,
-#         'categories': categories,
-#     }
-
-#     return render(request, 'searchresult.html', context)
 def productSearch(request):
     query = request.GET.get('query', '')
     sort_by = request.GET.get('sort_by', 'default')
     categories = Category.objects.filter(is_listed=True)
 
-    # Retrieve products based on search criteria
     products_list = Product.objects.filter(name__icontains=query)
-
-    # Apply sorting criteria
+    
     if sort_by == 'price_low_to_high':
         products_list = products_list.order_by('price')
     elif sort_by == 'price_high_to_low':
@@ -192,8 +282,7 @@ def productSearch(request):
     elif sort_by == 'name_z_to_a':
         products_list = products_list.order_by('-name')
     elif sort_by == 'new_arrivals':
-        # Your logic for sorting by new arrivals (e.g., based on creation date)
-        # Modify as needed
+        products_list = products_list.order_by('-id')
         pass
 
     context = {

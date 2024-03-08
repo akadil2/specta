@@ -8,6 +8,8 @@
 	
 
 	<!-- products -->
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 	<div class="product-section mt-150 mb-150">
 		<div class="container">
 
@@ -26,27 +28,33 @@
             </div>
 
 			<div class="row product-lists">
-				{% for i in prod %}
-				{% if i.is_listed and i.category.is_listed and i.stock >= 1 %}
-				<div class="col-lg-4 col-md-6 text-center {{ i.category.id }}">								
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="{% url 'singleproduct' item_id=i.id %}">
-								
-								{% if i.image %}
-                                <img src="{{ i.image.url }}" alt="{{ i.name }}" >
-                            {% endif %} 
-							</a>
+				{% for product in prod %}
+					{% if product.is_listed and product.category.is_listed and product.stock >= 1 %}
+						<div class="col-lg-4 col-md-6 text-center {{ product.category.id }}">                                
+							<div class="single-product-item">
+								<div class="product-image">
+									<a href="{% url 'singleproduct' item_id=product.id %}">
+										{% if product.image %}
+											<img src="{{ product.image.url }}" alt="{{ product.name }}">
+										{% endif %} 
+									</a>
+								</div>
+								<h3>{{ product.name }}</h3>
+								<p class="product-price">₹{{ product.price }}</p>
+								<div id="wishlist-form-container">
+									<form class="wishlist-form" action="{% url 'addtowishlist' product_id=product.id %}" method="post">
+										{% csrf_token %}
+										<button type="submit" class="wishlist-btn"><i class="far fa-heart"></i> Add to Wishlist</button>
+									</form>
+									
+									<div class="wishlist-message-container"></div>							
+								</div>															
+							</div>
 						</div>
-						<h3>{{i.name}}</h3>
-						<p class="product-price">₹{{i.price}}</p>
-						<!-- <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a> -->
-					</div>
-				</div>
-				{% endif %}
+					{% endif %}
 				{% endfor %}
-				
 			</div>
+			
 
 			
 	<div class="row">
@@ -72,7 +80,31 @@
 	</div>
 </div>
 </div>
-	{%endblock%}
+<script>
+    $(document).ready(function() {
+        $(".wishlist-form").submit(function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            var form = $(this);
+
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    // Handle the success response
+                    form.siblings(".wishlist-message-container").text(response.message);
+                },
+                error: function(error) {
+                    // Handle the error response
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+
+{%endblock%}
 	<!-- end products -->
 
 	

@@ -90,7 +90,7 @@
 		<div class="row">
 			<div class="col-lg-8 col-md-12">
 				<div class="cart-table-wrap">
-                    <form method="post" action="{% url 'processorder'  %}">
+                    <form method="post" action="{% url 'processorder'  %}" id="pay_form">
                         {% csrf_token %}
                     
                         <!-- Address Table -->
@@ -114,9 +114,12 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                          {% for message in messages %}
+		                  <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+		                  {% endfor %}
                 </div>
             </div><!-- Payment Option Table -->
-                        <div class="col-lg-4">
+            <div class="col-lg-4">
                         <table class="total-table">
                             <thead class="total-table-head">
                                 <tr class="table-total-row">
@@ -131,8 +134,8 @@
                                        <td>
                                         <!-- Assuming you want to allow users to select a payment method -->
                                            <select name="payment_method">
-                                            <option value="COD">Cash on Delivery (COD)</option>
-                                            <!-- Add more payment options as needed -->
+                                            <option value="COD">Cash on Delivery</option>
+                                            <option value="RAZORPAY">Razorpay</option>
                                         </select>
                                        </td>
                                      </tr>
@@ -142,23 +145,68 @@
                                   <div class="cart-buttons">
                                     <!-- <button type="submit" class="boxed-btn black">Place Order</button> -->
                                    <button type="submit" class="cart-btn"><i class="fas fa-shopping-cart"></i>Place Order</button>
+                                   <button id="rzp-button1">Pay with Razorpay</button>
                                  </div>
-                                </div>
-                               <div class="cart-buttons">
-                                <a href="/addnewaddress/" class="boxed-btn black">Add new Address</a>
+            </div>
+                <div class="cart-buttons">
+                    <a href="/addnewaddress/" class="boxed-btn black">Add new Address</a>
 							    
-                              </div>
-                    </form>
-                    
-					
-					
-				
-
-				
-			
-		</div>
+                </div>
+                </form>
+        </div>
 	</div>
-</div>    
+</div>  
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var totalAmount = "{{total_amount}}";
+var options = {
+    "key": "rzp_test_wtY6GWGahBxiu9", // Enter the Key ID generated from the Dashboard
+    "amount": totalAmount*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Specta",
+    "description": "Test Transaction",
+    "image": "",
+    "order_id": "{{order.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        // Payment has been successfully completed
+        // Here, you can submit your form or perform any other actions
+        document.getElementById('pay_form').submit(); // Replace 'your-form-id' with the actual ID of your form
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+
+rzp1.on('payment.failed', function (response) {
+    // Handle payment failure
+    alert(response.error.code);
+    alert(response.error.description);
+    alert(response.error.source);
+    alert(response.error.step);
+    alert(response.error.reason);
+    alert(response.error.metadata.order_id);
+    alert(response.error.metadata.payment_id);
+});
+
+document.getElementById('rzp-button1').addEventListener('click', function(e) {
+    // Prevent the default form submission
+    e.preventDefault();
+
+    // Open Razorpay Checkout
+    rzp1.open();
+});
+
+</script>  
 	
 {%endblock%}
 

@@ -151,3 +151,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mail2adilyo@gmail.com'
 EMAIL_HOST_PASSWORD = 'mgiv vksd zwvr xait'
 
+RAZOR_KEY_ID = 'rzp_test_wtY6GWGahBxiu9'
+RAZOR_KEY_SECRET = 'DYOIyhDEEQYis7V5nVo2IeB7'
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

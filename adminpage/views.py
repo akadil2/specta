@@ -121,7 +121,7 @@ def editProduct(request,item_id):
 
 # @login_required
 def categoryManage(request):
-        cat = Category.objects.all()
+        cat = Category.objects.all().order_by('-id')
      
         context = {
         'cat':cat,
@@ -161,7 +161,7 @@ def deleteCategory(request,item_id):
        return redirect('categorymanage')
 
 def orderManage(request):
-        orders = OrderItem.objects.all()
+        orders = OrderItem.objects.all().order_by('-id')
         context = {
               'orders':orders,              
         }

@@ -1,5 +1,6 @@
 {% load static %}
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +67,7 @@
 								<li><a href="">Contact</a></li>
 								<li><a href="/allproducts/">Shop</a></li> 
 								
-								{% if request.user.is_authenticated %}    
+								{% if request.user.is_authenticated and not request.user.is_superuser %}    
 								<li class="current-list-item"><a href="/userprofile/">Profile</a>
 									<ul class="sub-menu">
 										<li><a href="/userprofile/">Profile</a></li>
@@ -196,7 +197,7 @@
 	<!-- end features list section -->
 
 	<!-- product section -->
-	<div class="product-section mt-150 mb-150">
+	<!-- <div class="product-section mt-150 mb-150">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-8 offset-lg-2 text-center">
@@ -205,8 +206,8 @@
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid, fuga quas itaque eveniet beatae optio.</p>
 					</div>
 				</div>
-			</div>
-
+			</div> -->
+		
 			<!-- <div class="row">
 				<div class="col-lg-4 col-md-6 text-center">
 					<div class="single-product-item">
@@ -244,14 +245,15 @@
 	<!-- end product section -->
 
 	<!-- cart banner section -->
-	<!-- <section class="shop-banner">
+	<section class="shop-banner">
     	<div class="container">
-        	<h3>Month sale is on! <br> with big <span class="orange-text">Discount...</span></h3>
-            <div class="sale-percent"><span>Sale! <br> Upto</span>50% <span>off</span></div>
-            <a href="shop.html" class="cart-btn btn-lg">Shop Now</a>
+        	<h3>100 Off On all Products <br> Use Code: <span class="orange-text">FBUY</span></h3>
+            <div class="sale-percent"><span><br></span><span></span></div>
+            <a href="/allproducts/" class="cart-btn btn-lg">Shop Now</a>
         </div>
-    </section> -->
+    </section>
     <!-- end cart banner section -->
+	
 
 	<!-- testimonail-section -->
 	<div class="testimonail-section mt-150 mb-150">
@@ -350,19 +352,19 @@
 				<div class="col-lg-12">
 					<div class="logo-carousel-inner">
 						<div class="single-logo-item">
-							<img src="{% static 'img/company-logos/1.png" alt="">
+							<img src="{% static 'img/company-logos/1.png' %}" alt="">
 						</div>
 						<div class="single-logo-item">
-							<img src="{% static 'img/company-logos/2.png" alt="">
+							<img src="{% static 'img/company-logos/2.png' %}" alt="">
 						</div>
 						<div class="single-logo-item">
-							<img src="{% static 'img/company-logos/3.png" alt="">
+							<img src="{% static 'img/company-logos/3.png' %}" alt="">
 						</div>
 						<div class="single-logo-item">
-							<img src="{% static 'img/company-logos/4.png" alt="">
+							<img src="{% static 'img/company-logos/4.png' %}" alt="">
 						</div>
 						<div class="single-logo-item">
-							<img src="{% static 'img/company-logos/5.png" alt="">
+							<img src="{% static 'img/company-logos/5.png' %}" alt="">
 						</div>
 					</div>
 				</div>
@@ -423,7 +425,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-6 col-md-12">
-					<p>Copyrights &copy; 2019 - <a href="/"></a>,  All Rights Reserved.<br>
+					<p>Copyrights &copy; 2019 - <a href="https://imransdesign.com/">Imran Hossain</a>,  All Rights Reserved.<br>
 						Distributed By - <a href="https://themewagon.com/">Themewagon</a>
 					</p>
 				</div>

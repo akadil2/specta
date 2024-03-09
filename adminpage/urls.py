@@ -9,7 +9,6 @@ urlpatterns = [
     path('productmanage/',views.productManage,name='productmanage'),
     path('addproduct/',views.addProduct,name='addproduct'),
     path('productstatus/<int:item_id>',views.productStatus,name='productstatus'),
-    # path('deleteproduct/<int:item_id>',views.deleteProduct,name='deleteproduct'),
     path('editproduct/<str:item_id>',views.editProduct,name='editproduct'),
     path('categorymanage/',views.categoryManage,name='categorymanage'),
     path('addcategory/',views.addCategory,name='addcategory'),
@@ -18,6 +17,8 @@ urlpatterns = [
     path('deletecategory/<int:item_id>',views.deleteCategory,name='deletecategory'),
     path('ordermanage/',views.orderManage,name='ordermanage'),
     path('orderstatus/<int:item_id>/', views.orderStatus, name='orderstatus'),
+    path('couponmanage/',views.couponManage,name='couponmanage'),
+    path('addcoupon/',views.addCoupon, name='addcoupon'),
     path('adminlogout/',views.admLogout, name='adminlogout')
     
     

@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Coupon</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Add Coupon</h4>
+            
+            <form class="forms-sample" method="post">
+                {% csrf_token %}
+              <div class="form-group row">
+                <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Code</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="Coupon code" name="code">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Discount amount</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="amount" name="discount_amount">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Min order</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="" placeholder="amount" name="minorder_amount">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Valid From</label>
+                <div class="col-sm-9">
+                    <input type="date" class="form-control" id="" placeholder="DD/MM/YYYY" name="valid_from" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Valid To</label>
+                <div class="col-sm-9">
+                    <input type="date" class="form-control" id="" placeholder="DD/MM/YYYY" name="valid_to" required>
+                </div>
+            </div>
+              <button type="submit" class="btn btn-primary mr-2">Add</button>
+              <a class="btn btn-secondary" href="/couponmanage/">Back</a>
+              <!-- <button class="btn btn-light">Cancel</button> -->
+            </form>
+          </div>
+        </div>
+      </div>
+            <script src="{% static 'js/off-canvas.js' %}"></script>
+            <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+            <script src="{% static 'js/template.js' %}"></script>
+            <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+    
+</body>
+</html>

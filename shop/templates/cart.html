@@ -92,18 +92,43 @@
 
 				<div class="coupon-section">
 					<h3>Apply Coupon</h3>
-					<div class="coupon-form-wrap">
-						<form method="post" action="{% url 'viewcart' %}">
-							<p><input type="text" placeholder="Coupon"></p>
-							<button type="submit" class="cart-btn"><i class="fas fa-coupon"></i>Apply</button>
+					<div class="coupon-form-wrap">						
+						<form method="post" action="{% url 'viewcart' %}" id="couponForm">
+							{% csrf_token %}
+							<input type="text" placeholder="Coupon" name="coupon" id="couponInput" {% if applied_coupon %}value="{{ applied_coupon }}" readonly{% endif %}>
+							<button type="submit" class="cart-btn" id="applyCouponBtn" {% if applied_coupon %}disabled{% endif %}><i class="fas fa-coupon"></i>Apply</button>
+							{% if applied_coupon %}
+								<p class="applied-message">Coupon "{{ applied_coupon }}" applied</p>
+								<a href="/viewcart/" class="cart-btn">Remove</a>
+							{% endif %}
 						</form>
+						
 					</div>
 				</div>
+				
+				
+				
 			</div>
 		</div>
 	</div>
 </div>    
-	
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var couponForm = document.getElementById("couponForm");
+        var applyCouponBtn = document.getElementById("applyCouponBtn");
+
+        couponForm.addEventListener("submit", function (event) {
+            if (applyCouponBtn.hasAttribute("disabled")) {
+                // Prevent form submission if coupon is already applied
+                event.preventDefault();
+                alert("Coupon already applied.");
+            }
+        });
+    });
+</script>
+
+
 {%endblock%}
 
 

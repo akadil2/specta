@@ -150,6 +150,59 @@ def verifyEmail(request, user_id):
     return render(request, 'verifyemail.html', {'user': user})
 
 
+def forgotPassword(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, 'Invalid email address')
+            return render(request, 'signup.html')
+
+        User = get_user_model()
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+
+            # Generate and send OTP
+            otp = generate_otp()
+            request.session['otp'] = otp
+
+            # Send OTP via email
+            subject = 'OTP from SPECTA to reset your Password'
+            message = f'Your verification OTP is: {otp}'
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to_email = email
+
+            try:
+                send_mail(subject, message, from_email, [to_email])
+                messages.success(request, 'An OTP has been sent to your email. Please check and enter it.')
+                return redirect('verify_email', user_id=user.id)
+            except Exception as e:
+                messages.error(request, f'Error sending OTP email: {str(e)}')
+                return redirect('forgotpassword')
+
+    return render(request, 'forgotpassword.html')
+
+# def verify_email(request, user_id):
+#     if request.method == 'POST':
+#         entered_otp = request.POST.get('otp')
+#         stored_otp = request.session.get('otp')
+#         user = get_user_model().objects.get(pk=user_id)
+
+#         if entered_otp == stored_otp:
+#             # OTP is valid, proceed to reset the password
+#             # Redirect the user to a form to enter a new password
+#             return redirect('reset_password', user_id=user_id)
+#         else:
+#             # Invalid OTP, show an error message
+#             messages.error(request, 'Invalid OTP. Please try again.')
+
+#     return render(request, 'verify_email.html', {'user_id': user_id})
+
+
+
+
 def logOut(request):
     if request.user.is_authenticated:
         logout(request)

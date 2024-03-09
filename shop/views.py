@@ -103,24 +103,17 @@ def addtoCart(request, product_id):
 
     return redirect('login')
 
-# def viewCart(request): 
-#     if request.user.is_authenticated:    
-#         user = request.user
-#         cart = Cart.objects.filter(user=user)
-#         total_amount = sum(item.calculate_total_amount() for item in cart)
-#         context = {'cart': cart, 'total_amount': total_amount}
-
-#         return render(request, 'cart.html', context)
-#     return redirect('login')
 
 def viewCart(request): 
-    if request.user.is_authenticated:    
+    if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.filter(user=user)
         total_amount = sum(item.calculate_total_amount() for item in cart)
 
         # Check if a coupon code is provided in the request
         coupon_code = request.POST.get('coupon')
+        applied_coupon = None
+
         if coupon_code:
             try:
                 # Get the coupon based on the provided code
@@ -130,14 +123,16 @@ def viewCart(request):
                 if coupon.is_valid() and total_amount >= coupon.min_orderamount:
                     # Apply the coupon discount to the total amount
                     total_amount -= coupon.discount_amount
+                    applied_coupon = coupon.code
             except Coupon.DoesNotExist:
                 # Handle the case where the coupon code is invalid
                 messages.warning(request, 'Invalid coupon code.')
 
-        context = {'cart': cart, 'total_amount': total_amount}
+        context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon}
         return render(request, 'cart.html', context)
-    
+
     return redirect('login')
+
 
 def deleteCartItem(reqeust,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
@@ -149,7 +144,9 @@ def applyCoupon(request):
 def checkOut(request):    
     user = request.user
     cart = Cart.objects.filter(user=user)
+    discounted_amount = request.session.pop('discounted_amount', 0)
     total_amount = sum(item.product.price * item.quantity for item in cart)
+    total_amount -= discounted_amount
     addres = Address.objects.filter(user=request.user)
     context = {'cart':cart,
                'total_amount':total_amount,

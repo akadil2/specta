@@ -2,9 +2,9 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from userpage.models import Customer
-from shop.models import Category,Product,Order,OrderItem
+from shop.models import Category,Product,Order,OrderItem,Coupon
 from django.contrib.auth.decorators import login_required
-
+from datetime import datetime
 # Create your views here.
 
     
@@ -175,4 +175,28 @@ def orderStatus(request,item_id):
         order_item.save()
 
       return redirect('ordermanage')
+
+def couponManage(request):
+      coupon = Coupon.objects.all().order_by('-id')
+     
+      context = {
+        'coupon':coupon,
+        }
+      return render(request, 'couponmanage.html', context)
+
+def addCoupon(request):
+      if request.method == 'POST':
+          code = request.POST.get('code')
+          discount = request.POST.get('discount_amount')
+          minorder = request.POST.get('minorder_amount')          
+          valid_from = request.POST.get('valid_from')
+          valid_to = request.POST.get('valid_to')
+
+          validfrom = datetime.strptime(valid_from, '%Y-%m-%d').date()
+          validto = datetime.strptime(valid_to, '%Y-%m-%d').date()
+
+          coupon = Coupon.objects.create(code=code,discount_amount=discount,min_orderamount=minorder,valid_from=validfrom,valid_to=validto)
+          coupon.save()
+          return redirect('couponmanage')
+      return render(request,'addcoupon.html')
       

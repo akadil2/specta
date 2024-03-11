@@ -67,6 +67,7 @@ class Order(models.Model):
     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     items = models.ManyToManyField(Product, through=OrderItem)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     address = models.ForeignKey('userpage.Address', on_delete=models.SET_NULL, null=True, blank=True)
     payment_method = models.CharField(max_length=50)
 

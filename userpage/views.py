@@ -1,6 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,get_user_model,update_session_auth_hash
@@ -19,14 +16,11 @@ import re
 
 
 
-# Create your views here.
-
+# home page view
 def homePage(request):
-    # if request.user.is_authenticated:
-        return render(request,'index.html')
-    # return redirect('home')
-    
+        return render(request,'index.html')    
 
+#login view
 def signin(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:            
@@ -55,10 +49,7 @@ def signin(request):
 
     return render(request, 'login.html')
 
-    
-
 # views for new user signup #
-
 def generate_otp():
     return ''.join(random.choices('0123456789', k=6))
 
@@ -164,11 +155,9 @@ def forgotPassword(request):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
 
-            # Generate and send OTP
             otp = generate_otp()
             request.session['otp'] = otp
 
-            # Send OTP via email
             subject = 'OTP from SPECTA to reset your Password'
             message = f'Your verification OTP is: {otp}'
             from_email = settings.DEFAULT_FROM_EMAIL
@@ -184,23 +173,41 @@ def forgotPassword(request):
 
     return render(request, 'forgotpassword.html')
 
-# def verify_email(request, user_id):
-#     if request.method == 'POST':
-#         entered_otp = request.POST.get('otp')
-#         stored_otp = request.session.get('otp')
-#         user = get_user_model().objects.get(pk=user_id)
+def verify_email(request, user_id):
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        stored_otp = request.session.get('otp')
+        user = get_user_model().objects.get(pk=user_id)
 
-#         if entered_otp == stored_otp:
-#             # OTP is valid, proceed to reset the password
-#             # Redirect the user to a form to enter a new password
-#             return redirect('reset_password', user_id=user_id)
-#         else:
-#             # Invalid OTP, show an error message
-#             messages.error(request, 'Invalid OTP. Please try again.')
+        if entered_otp == stored_otp:           
+            return redirect('resetpassword', user_id=user_id)
+        else:            
+            messages.error(request, 'Invalid OTP. Please try again.')
 
-#     return render(request, 'verify_email.html', {'user_id': user_id})
+    return render(request, 'verify_email.html', {'user_id': user_id})
 
+def resetPassword(request, user_id):
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
 
+        if not new_password.isalnum():
+            messages.error(request, 'Password should be alphanumeric')
+            return render(request, 'resetpassword.html', {'user_id': user_id})
+
+        if new_password == confirm_password:            
+            user = get_user_model().objects.get(pk=user_id)
+            user.set_password(new_password)
+            user.save()
+            
+            del request.session['otp']
+            
+            messages.success(request, 'Password reset successfully. You can now log in with your new password.')
+            return redirect('login')
+        else:        
+            messages.error(request, 'Passwords do not match. Please try again.')
+
+    return render(request, 'resetpassword.html', {'user_id': user_id})
 
 
 def logOut(request):
@@ -287,16 +294,13 @@ def changePassword(request):
         password2 = request.POST.get('password2')
         user = request.user
 
-        # Authenticate the user with their current password
         user_authenticated = authenticate(username=user.username, password=current_password)
 
         if user_authenticated is not None:
-            # Current password is correct, proceed with password change
             if password1 == password2:
                 user.set_password(password1)
                 user.save()
 
-                # Update the session to avoid logout after changing the password
                 update_session_auth_hash(request, user)
 
                 messages.success(request, 'Password changed successfully.')
@@ -308,7 +312,5 @@ def changePassword(request):
 
     return render(request, 'changepassword.html')
 
-# def forgotPassword(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
+ 
         

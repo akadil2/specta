@@ -25,9 +25,7 @@
 <div class="cart-section mt-150 mb-150">
 	<div class="container">
 		<div class="col-12">
-			{% for message in messages %}
-		 <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
-		 {% endfor %}
+			
 		 <div class="row">
 			<div class="col-lg-8 col-md-12">
 				<div class="cart-table-wrap">
@@ -88,6 +86,9 @@
 						<a href="/checkout/" class="boxed-btn black">Check Out</a>
 						<a href="/allproducts/" class="boxed-btn">Continue Shopping</a>						
 					</div>
+					{% for message in messages %}
+		            <h6 style="color: rgb(12, 86, 26);" {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{message}}</h6>
+		             {% endfor %}
 				</div>
 
 				<div class="coupon-section">

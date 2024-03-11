@@ -6,7 +6,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>User management</title>
+  <title>Sales Reports</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/base/vendor.bundle.base.css">
@@ -89,45 +89,48 @@
                   <!-- <h4 class="card-title">Customers</h4> -->
                   <div class="row">
                     <div class="col-sm-12">
-                        <input type="text" class="form-control" id="searchInput" placeholder="Search...">
-                  </div>
+                        <form method="get" action="{% url 'salesreport' %}">
+                            <label for="start_date">Start Date:</label>
+                            <input type="date" name="start_date" value="">
+                
+                            <label for="end_date">End Date:</label>
+                            <input type="date" name="end_date" value=""><br>
+                            OR                
+                            <select class="form-control" name="period" id="periodSelect">
+                                <option value="day" {% if period == 'day' %}selected{% endif %}>Day</option>
+                                <option value="week" {% if period == 'week' %}selected{% endif %}>Week</option>
+                                <option value="month" {% if period == 'month' %}selected{% endif %}>Month</option>
+                                <option value="year" {% if period == 'year' %}selected{% endif %}>Year</option>
+                            </select>
+                
+                            <button type="submit" class="btn btn-primary btn-icon-text btn-rounded">
+                                <i class="ti-search btn-icon-prepend"></i>Search
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                  <p class="card-description">
-                    
-                  </p>
-                  <div class="table-responsive">
+                
+                <p class="card-description"></p>
+                <div class="table-responsive">
                     <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Username</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for i in cust%}
-                        <tr>
-                          <td>{{i.username}}</td>
-                          <td>{{i.email}}</td>
-                          <td>{{i.phone_number}}</td>
-                          <td>
-                           
-                              <a class="btn btn-secondary btn-sm" href="/userstatus/{{i.id}}">
-                                {% if i.is_blocked %}
-                                  Unblock
-                                {% else %}
-                                  Block
-                                {% endif %}
-                              </a>
-                            <!-- </form> -->
-                          </td>
-                        </tr>
-                        {% endfor %}
-                        
-                      </tbody>
+                        <thead>
+                            <tr>
+                                <th>Sales count</th>
+                                <th>Total sales</th>
+                                <th>Discounts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ total_sales_count }}</td>
+                                <td>{{ total_sales_amount }}</td>
+                                <td>{{ total_discount_amount }}</td>
+                            </tr>
+                        </tbody>
                     </table>
-                  </div>
+                </div>
+                
+                
                 </div>
               </div>
             </div>
@@ -158,16 +161,7 @@
   <!-- endinject -->
   <!-- Custom js for this page-->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script>
-    $(document).ready(function(){
-        $("#searchInput").on("keyup", function() {
-            var value = $(this).val().toLowerCase();
-            $("tbody tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
-    });
-</script>
+  
   <!-- End custom js for this page-->
 </body>
 

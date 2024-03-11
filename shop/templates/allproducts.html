@@ -3,7 +3,20 @@
 {%block title%}Shop{%endblock%}
 {%block heading%}Shop{%endblock%}
 {%block table%}
- 
+<style>
+	.single-product-item {
+		height: 100%; 
+	}
+	.product-image {
+		max-height: 200px; 
+		overflow: hidden; 
+	}
+	.product-img {
+		width: 100%; 
+		height: auto; 
+	}
+	
+</style> 
     
 	
 
@@ -35,7 +48,7 @@
 								<div class="product-image">
 									<a href="{% url 'singleproduct' item_id=product.id %}">
 										{% if product.image %}
-											<img src="{{ product.image.url }}" alt="{{ product.name }}">
+											<img class="product-img" src="{{ product.image.url }}" alt="{{ product.name }}">
 										{% endif %} 
 									</a>
 								</div>

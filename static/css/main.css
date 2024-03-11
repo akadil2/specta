@@ -2403,17 +2403,22 @@ ul.social-link-team li a {
 
 .single-product-item {
   margin-bottom: 30px;
+  height: 100%;
 }
 
 .product-image {
   padding: 30px;
   padding-bottom: 0;
+  max-height: 200px;
+    overflow: hidden;
 }
 
 .product-image img {
   width: 90%;
   border-radius: 5px;
   margin-bottom: 20px;
+  width: 100%; 
+  height: auto;
 }
 
 .single-product-item h3 {

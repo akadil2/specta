@@ -6,7 +6,6 @@ from django.contrib import messages
 import razorpay
 from django.http import JsonResponse
 
-
 #all product view
 def allProducts(request):
     prod_list = Product.objects.all()
@@ -53,22 +52,18 @@ def addtoWishlist(request, product_id):
         product = Product.objects.get(pk=product_id)
         user = request.user
 
-        if request.method == 'POST':
-            # Check if the product is already in the wishlist
+        if request.method == 'POST':            
             if Wishlist.objects.filter(user=user, product=product).exists():
                 message = 'Product is already in the wishlist.'
             else:
-                # Add the product to the wishlist
                 Wishlist.objects.create(user=user, product=product)
                 message = 'Product added to the wishlist.'
 
             # Return a JSON response with the success message
             return JsonResponse({'message': message})
-        else:
-            # Handle cases where the request method is not POST
+        else:            
             return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
-    # Add a message for unauthenticated users
     messages.error(request, 'Please log in to add products to your wishlist.')
     return redirect('login')
 
@@ -110,22 +105,18 @@ def viewCart(request):
         cart = Cart.objects.filter(user=user)
         total_amount = sum(item.calculate_total_amount() for item in cart)
 
-        # Check if a coupon code is provided in the request
         coupon_code = request.POST.get('coupon')
         applied_coupon = None
 
         if coupon_code:
             try:
-                # Get the coupon based on the provided code
                 coupon = Coupon.objects.get(code=coupon_code)
-
-                # Check if the coupon is valid
+              
                 if coupon.is_valid() and total_amount >= coupon.min_orderamount:
-                    # Apply the coupon discount to the total amount
                     total_amount -= coupon.discount_amount
                     applied_coupon = coupon.code
+                    request.session['discounted_amount'] = coupon.discount_amount
             except Coupon.DoesNotExist:
-                # Handle the case where the coupon code is invalid
                 messages.warning(request, 'Invalid coupon code.')
 
         context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon}
@@ -133,18 +124,16 @@ def viewCart(request):
 
     return redirect('login')
 
-
+#deleting products in cart
 def deleteCartItem(reqeust,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
     return redirect('viewcart')
 
-def applyCoupon(request):
-    return redirect('viewcart')
-
+#view checkout pge
 def checkOut(request):    
     user = request.user
     cart = Cart.objects.filter(user=user)
-    discounted_amount = request.session.pop('discounted_amount', 0)
+    discounted_amount = request.session.get('discounted_amount', 0)
     total_amount = sum(item.product.price * item.quantity for item in cart)
     total_amount -= discounted_amount
     addres = Address.objects.filter(user=request.user)
@@ -171,16 +160,19 @@ def addnewAddress(request):
         adress = Address.objects.create(user=user,name=name,house_name=hname,phone=phone,post=post,city=city,pin_code=pincode,state=state)
         adress.save()
         return redirect('checkout')
-            
-
+        
     return render(request,'addnewaddress.html')
 
+     
+from decimal import Decimal
 
-    
 def processOrder(request):
     user = request.user
     cart_items = Cart.objects.filter(user=user)
     total_amount = sum(item.product.price * item.quantity for item in cart_items)
+
+    # Retrieve the discount amount from the session without removing it
+    discount_amount = request.session.pop('discounted_amount', 0)
 
     if request.method == 'POST':
         selected_address_id = request.POST.get('selected_address')
@@ -190,7 +182,10 @@ def processOrder(request):
             messages.error(request, "Please select an address.")
             return redirect('checkout')         
         
-        order = Order.objects.create(user=user, total_price=total_amount, payment_method=payment_method)
+        # Calculate the total price with the discount
+        total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
+
+        order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
         
         for cart_item in cart_items:
             OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
@@ -206,12 +201,14 @@ def processOrder(request):
         
         return redirect('ordersuccess')
 
-    return render(request, 'checkout.html') 
+    return render(request, 'checkout.html')
+
 
 def razorpayOrder(request):
     user = request.user
     cart_items = Cart.objects.filter(user=user)
     total_amount = sum(item.product.price * item.quantity for item in cart_items)
+    discount_amount = request.session.pop('discounted_amount', 0)
 
     if request.method == 'POST':
         selected_address_id = request.POST.get('selected_address')
@@ -224,7 +221,10 @@ def razorpayOrder(request):
             messages.error(request, "Please select an address.")
             return redirect('checkout')
         
-        order = Order.objects.create(user=user, total_price=total_amount, payment_method=payment_method)
+        total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
+
+        order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
+        
        
         for cart_item in cart_items:
             OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
@@ -259,8 +259,10 @@ def cancelOrder(request,item_id):
 
     return redirect('vieworders')
 
-from django.shortcuts import render
-from .models import Product
+def requestReturn(request,item_id):
+    item = OrderItem.objects.get(pk=item_id)
+    item.status = 'return_requested'
+    return redirect('vieworders')
 
 
 def productSearch(request):

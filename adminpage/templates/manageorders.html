@@ -55,34 +55,33 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="basic-table.html">
+            <a class="nav-link" href="/ordermanage/">
               <i class="ti-view-list-alt menu-icon"></i>
               <span class="menu-title">Orders</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="basic-table.html">
+            <a class="nav-link" href="">
               <i class="ti-view-list-alt menu-icon"></i>
               <span class="menu-title">Return</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="basic-table.html">
+            <a class="nav-link" href="/couponmanage/">
               <i class="ti-view-list-alt menu-icon"></i>
               <span class="menu-title">Coupons</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="basic-table.html">
+            <a class="nav-link" href="">
               <i class="ti-view-list-alt menu-icon"></i>
               <span class="menu-title">Banners</span>
             </a>
           </li>
           <li>
-            <a class="btn btn-danger" href="/logout/">logout</a>
+            <a class="btn btn-danger" href="/adminlogout/">logout</a>
           </li>
         </ul>
-   
       </nav>
       
       <!-- partial -->
@@ -92,54 +91,50 @@
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <div>
-                    
-                    <a class="btn btn-secondary float-right" href="/addproduct/">+ Add Product</a>
-
-                  </div>
+                  
                    <!-- <div class="table-responsive">
                     <table class="table table-bordered"> -->
                       <div class="table-responsive">
-                        <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Order id</th>
-                          <th>User</th>
-                          <th>Product</th>                          
-                          <th>Quantity</th>
-                          <th>Payment</th>
-                          <th>Image</th>
-                          <th>Amount</th>
-                          <th>Status</th>                           
-                        </tr>
-                      </thead>
-                      <tbody>
-                     
-                      {% for order_item in orders %}
-                        <tr>
-                          <td>{{ order_item.order.id }}</td>
-                          <td>{{ order_item.order.user.username }}</td>
-                          <td>{{ order_item.product.name }}</td>
-                          <td>{{ order_item.quantity }}</td>
-                          <td>{{ order_item.order.payment_method }}</td>
-                          <td><img src="{{ order_item.product.image.url }}" alt="Product Image" style="width: 50px; height: 50px;"></td>
-                          <td>{{ order_item.calculate_amount }}</td>
-                          <td>
-                            <!-- {{ order_item.get_status_display }} -->
-                            <form method="post" action="{% url 'orderstatus' order_item.id %}" style="display: inline;">
-                                {% csrf_token %}
-                                <select name="status" onchange="this.form.submit()">
-                                    <option value="pending" {% if 'pending' == order_item.status %}selected{% endif %}>Pending</option>
-                                    <option value="shipped" {% if 'shipped' == order_item.status %}selected{% endif %}>Shipped</option>
-                                    <option value="cancelled" {% if 'cancelled' == order_item.status %}selected{% endif %}>Cancel</option>
-                                    <option value="delivered" {% if 'delivered' == order_item.status %}selected{% endif %}>Delivered</option>
-                                </select>
-                            </form>
-                        </td>
-                        </tr>
-                      {% endfor %}                      
-                      </tbody>
-                    </table>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Order id</th>
+                            <th>User</th>
+                            <th>Product</th>                          
+                            <th>Quantity</th>
+                            <th>Payment</th>
+                            <th>Image</th>
+                            <th>Amount</th>
+                            <th>Status</th>                           
+                          </tr>
+                        </thead>
+                        <tbody>
+                      
+                        {% for order_item in orders %}
+                          <tr>
+                            <td>{{ order_item.order.id }}</td>
+                            <td>{{ order_item.order.user.username }}</td>
+                            <td>{{ order_item.product.name }}</td>
+                            <td>{{ order_item.quantity }}</td>
+                            <td>{{ order_item.order.payment_method }}</td>
+                            <td><img src="{{ order_item.product.image.url }}" alt="Product Image" style="width: 50px; height: 50px;"></td>
+                            <td>{{ order_item.calculate_amount }}</td>
+                            <td>
+                              <!-- {{ order_item.get_status_display }} -->
+                              <form method="post" action="{% url 'orderstatus' order_item.id %}" style="display: inline;">
+                                  {% csrf_token %}
+                                  <select name="status" onchange="this.form.submit()">
+                                      <option value="pending" {% if 'pending' == order_item.status %}selected{% endif %}>Pending</option>
+                                      <option value="shipped" {% if 'shipped' == order_item.status %}selected{% endif %}>Shipped</option>
+                                      <option value="cancelled" {% if 'cancelled' == order_item.status %}selected{% endif %}>Cancel</option>
+                                      <option value="delivered" {% if 'delivered' == order_item.status %}selected{% endif %}>Delivered</option>
+                                  </select>
+                              </form>
+                          </td>
+                          </tr>
+                        {% endfor %}                      
+                        </tbody>
+                      </table>
                   </div>
                 </div>
               </div>

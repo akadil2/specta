@@ -5,19 +5,76 @@ from userpage.models import Customer
 from shop.models import Category,Product,Order,OrderItem,Coupon
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.db.models import Sum, Count
+from django.utils import timezone
+
+ 
 # Create your views here.
 
     
-def adminHome(request):
-#        if request.user.is_authenticated:
-        return render(request, 'admhome.html')
-#        return redirect('home')
+def adminHome(request, period='month'):
+    today = timezone.now()
+    start_date = today - timezone.timedelta(days=30)
+    
+    orders = Order.objects.filter(created_at__gte=start_date)
 
-def admLogout(request):
-       if request.user.is_authenticated:
-              logout(request)
-       return render(request,'index.html')
-       
+    total_sales_amount = orders.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_discount_amount = orders.aggregate(Sum('discount_amount'))['discount_amount__sum'] or 0
+    total_sales_count = orders.aggregate(Count('id'))['id__count'] or 0
+
+    context = {
+        'total_sales_amount': total_sales_amount,
+        'total_discount_amount': total_discount_amount,
+        'total_sales_count': total_sales_count,
+    }
+
+    return render(request, 'admhome.html', context)
+
+def salesReport(request, period='day'):
+    today = timezone.now()
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    period = request.GET.get('period', 'month')
+
+    if start_date_str and end_date_str:
+        # Custom date range provided
+        start_date = timezone.datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = timezone.datetime.strptime(end_date_str, "%Y-%m-%d")
+    else:
+        # Use predefined period
+        if period == 'day':
+            start_date = today - timezone.timedelta(days=1)
+        elif period == 'week':
+            start_date = today - timezone.timedelta(weeks=1)
+        elif period == 'month':
+            start_date = today - timezone.timedelta(days=30)
+        elif period == 'year':
+            start_date = today - timezone.timedelta(days=365)
+        else:
+            return render(request, 'invalid_period.html')
+
+        end_date = today
+
+    # Filter orders based on the specified date range
+    orders = Order.objects.filter(created_at__range=[start_date, end_date])
+
+    # Calculate total sales amount, total discounts, and sales count
+    total_sales_amount = orders.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_discount_amount = orders.aggregate(Sum('discount_amount'))['discount_amount__sum'] or 0
+    total_sales_count = orders.aggregate(Count('id'))['id__count'] or 0
+
+    context = {
+        'total_sales_amount': total_sales_amount,
+        'total_discount_amount': total_discount_amount,
+        'total_sales_count': total_sales_count,
+        'start_date': start_date,
+        'end_date': end_date,
+        'period': period,
+    }
+
+    return render(request, 'salesreport.html', context)
+
+
 
 # @login_required
 def userManage(request):
@@ -114,11 +171,6 @@ def editProduct(request,item_id):
         return render(request, 'editproduct.html', {'categories': categories, 'item': item})
 
 
-
-# def deleteProduct(request,item_id):
-#        item = Product.objects.filter(pk=item_id).delete()
-#        return redirect('productmanage')
-
 # @login_required
 def categoryManage(request):
         cat = Category.objects.all().order_by('-id')
@@ -199,4 +251,10 @@ def addCoupon(request):
           coupon.save()
           return redirect('couponmanage')
       return render(request,'addcoupon.html')
-      
+
+def admLogout(request):
+       if request.user.is_authenticated:
+              logout(request)
+       return render(request,'index.html')
+
+

@@ -99,11 +99,22 @@
                     <div class="single-product-form">
                         <form action="{% url 'addtocart' product_id=item.id %}" method="post">
                             {% csrf_token %}
-                            <input type="number" name="quantity" placeholder="1" min="1" max="{% if item.stock and item.stock < 5 %}{{ item.stock }}{% else %}5{% endif %}">
+                            <input type="number" name="quantity" placeholder="1" min="1" max="{% if item.stock and item.stock < 5 %}{{ item.stock }}{% else %}5{% endif %}" title="Maximum limit reached">
                             <button type="submit" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            
+                        </form>
+                        <div id="cart-message">
+                            {% if message %}
+                                {{ message }}
+                            {% endif %}
+                        </div>
+                        <form class="wishlist-form" action="{% url 'addtowishlist' product_id=item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-btn"><i class="fas fa-heart"></i> Add to Wishlist</button>
                         </form>
                             
                         <p><strong>Category: </strong>{{ item.category.name }}</p>
+                        <div class="wishlist-message-container"></div>
                     </div>
                 </div>
             </div>
@@ -148,9 +159,29 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function() {
+        $(".wishlist-form").submit(function(event) {
+            event.preventDefault();  // Prevent the default form submission
 
-  
+            var form = $(this);
 
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    // Handle the success response
+                    form.siblings(".wishlist-message-container").text(response.message);
+                },
+                error: function(error) {
+                    // Handle the error response
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script> 
 
 {%endblock%}
 <!-- end single product -->

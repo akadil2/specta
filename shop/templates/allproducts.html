@@ -16,6 +16,7 @@
 		height: auto; 
 	}
 	
+	
 </style> 
     
 	
@@ -24,6 +25,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 	<div class="product-section mt-150 mb-150">
+		
 		<div class="container">
 
 			<div class="row">
@@ -38,6 +40,19 @@
                         </ul>
                     </div>
                 </div>
+				<form method="get" action="{% url 'productsearch' %}">
+					
+					<label for="sort">Sort by:</label>
+					<select id="sort" name="sort_by" onchange="this.form.submit()">
+						<option value="" disabled selected>Select an option</option>
+						<option value="price_low_to_high">Price Low to High</option>
+						<option value="price_high_to_low">Price High to Low</option>
+						<option value="name_a_to_z">Name A to Z</option>
+						<option value="name_z_to_a">Name Z to A</option>
+						<option value="new_arrivals">New Arrivals</option>
+					</select>
+					
+				</form>
             </div>
 
 			<div class="row product-lists">
@@ -57,7 +72,7 @@
 								<div id="wishlist-form-container">
 									<form class="wishlist-form" action="{% url 'addtowishlist' product_id=product.id %}" method="post">
 										{% csrf_token %}
-										<button type="submit" class="wishlist-btn"><i class="far fa-heart"></i> Add to Wishlist</button>
+										<button type="submit" class="wishlist-btn"><i class="far fa-heart"></i> </button>
 									</form>
 									
 									<div class="wishlist-message-container"></div>							

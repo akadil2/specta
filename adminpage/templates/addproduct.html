@@ -10,6 +10,9 @@
 <body>
     <div class="col-md-6 grid-margin stretch-card">
         <div class="card">
+            {% for message in messages %}
+            <h4 style="color: red;">{{message}} </h4>
+            {% endfor %}
           <div class="card-body">
             <h4 class="card-title">Add Product</h4>
             <form class="forms-sample" method="post" enctype="multipart/form-data">

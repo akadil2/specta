@@ -5,6 +5,7 @@ urlpatterns = [
 
     path('adminhome/',views.adminHome,name='adminhome'),
     path('salesreport/',views.salesReport,name='salesreport'),
+    path('generatepdf/',views.generatePdf,name='generatepdf'),
     path('usermanage/',views.userManage,name='usermanage'),
     path('userstatus/<int:user_id>',views.userStatus,name='userstatus'),
     path('productmanage/',views.productManage,name='productmanage'),
@@ -17,7 +18,8 @@ urlpatterns = [
     path('editcategory/<int:item_id>', views.editCategory, name='editcategory'),
     path('deletecategory/<int:item_id>',views.deleteCategory,name='deletecategory'),
     path('ordermanage/',views.orderManage,name='ordermanage'),
-    path('orderstatus/<int:item_id>/', views.orderStatus, name='orderstatus'),
+    path('orderstatus/<int:order_id>/', views.orderStatus, name='orderstatus'),
+    path('acceptreturn/<int:order_id>/', views.acceptReturn, name='acceptreturn'),
     path('couponmanage/',views.couponManage,name='couponmanage'),
     path('addcoupon/',views.addCoupon, name='addcoupon'),
     path('adminlogout/',views.admLogout, name='adminlogout')

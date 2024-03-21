@@ -20,9 +20,7 @@
                                 <th class="product-price">Price</th>
                                 <th class="product-quantity">Quantity</th>
                                 <th class="product-remove">Status</th>
-                                <th class="product-remove">Action</th>
-                                <th class="product-remove">Return Status</th>
-
+                                <th class="product-remove">Action</th>                               
                             </tr>
                         </thead>
                         <tbody>
@@ -35,33 +33,20 @@
                                         <td class="product-price">{{ order_item.product.price }}</td>
                                         <td class="product-quantity">{{ order_item.quantity }}</td>
                                         <td class="product-remove">{{ order_item.get_status_display }}</td>
-                                        <!-- <td>
-                                          
-                                            {% if order_item.status != 'cancelled' %}
-                                                {% if order_item.status == 'delivered' %}
-                                                    <a href="/returnorder/{{ order_item.id }}">Requset Return</a>
-                                                {% else %}
-                                                    <a href="/cancelorder/{{ order_item.id }}">Cancel</a>
-                                                {% endif %}
-                                            {% endif %}
-                                        </td> -->
+                                        
                                         <td>
-                                            {% if order_item.status != 'cancelled' %}
-                                              {% if order_item.status == 'delivered' and not order_item.return_status == 'returned' %}
-                                                <a href="/returnorder/{{ order_item.id }}">Request Return</a>
-                                              {% elif order_item.status != 'delivered' %}
-                                                <a href="/cancelorder/{{ order_item.id }}">Cancel</a>
-                                              {% endif %}
-                                            {% endif %}
+                                          {% if order_item.status != 'cancelled' %}
+                                           {% if order_item.status == 'delivered' and not order_item.return_status == 'returned' %}
+                                              <a href="/returnorder/{{ order_item.id }}">Request Return</a>
+                                            {% elif order_item.status != 'delivered'  %}
+                                              <a href="/cancelorder/{{ order_item.id }}">Cancel</a>
+                                           {% endif %}
+                                          {% endif %}
                                          </td>
-                                          
-                                        <td class="product-remove">
-                                            {{ order_item.return_status|default:"N/A" }}
-                                            {% if order_item.return_reason %}
-                                              <br>Reason: {{ order_item.return_reason }}
-                                            {% endif %}
-                                          </td>
-                                          
+                                        <td>
+                                            <a href="/orderdetails/{{ order.id }}">Details</a>
+
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}

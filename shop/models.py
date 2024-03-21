@@ -1,5 +1,6 @@
 from django.db import models
 from userpage.models import Customer,Address
+from django.db.models import Sum,F
 
 
 # Create your models here.
@@ -33,6 +34,7 @@ class Cart(models.Model):
 
     def calculate_total_amount(self):
         return self.product.price * self.quantity
+   
 
     def __str__(self):
         return self.user.username
@@ -42,12 +44,17 @@ class OrderItem(models.Model):
     SHIPPED = 'shipped'
     CANCELLED = 'cancelled'
     DELIVERED = 'delivered'
+    RETURN_REQUESTED = 'return_requested'
+    RETURNED = 'returned'
 
     STATUS_CHOICES = [
         (PENDING, 'Pending'),
         (SHIPPED, 'Shipped'),
         (CANCELLED, 'Cancelled'),
         (DELIVERED, 'Delivered'),
+        (RETURN_REQUESTED,'Return Requested'),
+        (RETURNED, 'Returned')
+        
     ]
 
     order = models.ForeignKey('Order', on_delete=models.CASCADE)

@@ -2086,7 +2086,7 @@ a.video-play-btn {
   height: 100%;
   content: "";
   background-color: #051922;
-  opacity: 0.3;
+  
 }
 
 .abt-section .abt-text {
@@ -2158,7 +2158,6 @@ a.video-play-btn {
 }
 
 .feature-bg:after {
-  background-image: url(../img/feature-bg.jpg);
   position: absolute;
   right: 0;
   top: 0;

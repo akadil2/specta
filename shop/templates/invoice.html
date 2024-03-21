@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+</head>
+<body>
+    <div>
+        <h1>Shop Name</h1>
+        <p>Shop Address</p>
+        <p>Contact: Shop Contact</p>
+        <p>Date: {{ order.created_at|date:"Y-m-d" }}</p>
+    </div>
+    
+    <hr> <!-- Horizontal line to separate shop details from customer details -->
+
+    <h2>Customer Details</h2>
+    <p>Name: {{ order.address.name }}</p> <!-- Accessing customer name from Address model -->
+    <p>Address: {{ order.address.house_name }}</p> <!-- Accessing customer address from Address model -->
+    <p>Pin: {{order.address.pin_code}}</p>
+    <p>Customer Contact: {{ order.address.phone }}</p> <!-- Accessing customer contact from Address model -->
+
+    <hr> <!-- Horizontal line to separate customer details from order details -->
+
+    <h2>Order Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>                        
+                <th>Price</th>
+                <th>Discount</th>                                
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_item in order.orderitem_set.all %}
+            <tr>
+                <td>{{ order_item.product.name }}</td>
+                <td>{{ order_item.quantity }}</td>
+                <td>{{ order_item.product.price }}</td>
+                <td>{{ order.discount_amount }}</td>
+                <td>{{ order.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

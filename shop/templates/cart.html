@@ -25,7 +25,9 @@
 <div class="cart-section mt-150 mb-150">
 	<div class="container">
 		<div class="col-12">
-			
+			{% for message in messages %}
+		            <h5 style="color: rgb(12, 86, 26);" {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{message}}</h5>
+		             {% endfor %}
 		 <div class="row">
 			<div class="col-lg-8 col-md-12">
 				<div class="cart-table-wrap">
@@ -42,14 +44,20 @@
 						</thead>
 						<tbody>
 							{% for item in cart %}
+						    {% if item.product.is_listed and item.product.category.is_listed and item.product.stock >= 1 %} 
 							<tr class="table-body-row">
-								<td class="product-remove"><a href="{% url 'deletecartitem' item.id %}"><i class="far fa-window-close"></i></a></td>
-								<td class="product-image"><img src="{{item.product.image.url}}" alt=""></td>
-								<td class="product-name">{{item.product.name}}</td>
-								<td class="product-price">{{item.product.price}}</td>
-								<td class="product-quantity">{{item.quantity}}</td>
-								
+								<td class="product-remove">
+									<a href="{% url 'deletecartitem' item.id %}"><i class="far fa-window-close"></i></a>
+								</td>
+								<td class="product-image"><img src="{{ item.product.image.url }}" alt=""></td>
+								<td class="product-name">{{ item.product.name }}</td>
+								<td class="product-price">{{ item.product.price }}</td>
+								<td class="product-quantity">
+									<input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{% if item.product.stock and item.product.stock < 5 %}{{ item.product.stock }}{% else %}5{% endif %}"
+      										 onchange="updateQuantity('{{ item.id }}', this.value)">
+								</td>
 							</tr>
+							{% endif %}
 							{%endfor%}
 						</tbody>
 					</table>
@@ -68,15 +76,19 @@
 							<tbody>
 								<tr class="total-data">
 									<td><strong>Subtotal: </strong></td>
-									<td>₹{{total_amount}}</td>
+									<td id="subtotal">₹{{total_amount}}</td>
 								</tr>
 								<tr class="total-data">
 									<td><strong>Shipping: </strong></td>
 									<td>₹0.00</td>
-								</tr>
+								</tr>								
 								<tr class="total-data">
 									<td><strong>Total: </strong></td>
-									<td>₹{{total_amount}}</td>
+									<td id="total">₹{{total_amount}}</td>
+								</tr>
+								<tr class="total-data">
+									<td><strong>Discount Got: </strong></td>
+									<td>₹{{ discounted_amount}}</td>
 								</tr>
 
 							
@@ -86,9 +98,7 @@
 						<a href="/checkout/" class="boxed-btn black">Check Out</a>
 						<a href="/allproducts/" class="boxed-btn">Continue Shopping</a>						
 					</div>
-					{% for message in messages %}
-		            <h6 style="color: rgb(12, 86, 26);" {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{message}}</h6>
-		             {% endfor %}
+					
 				</div>
 
 				<div class="coupon-section">
@@ -100,7 +110,7 @@
 							<button type="submit" class="cart-btn" id="applyCouponBtn" {% if applied_coupon %}disabled{% endif %}><i class="fas fa-coupon"></i>Apply</button>
 							{% if applied_coupon %}
 								<p class="applied-message">Coupon "{{ applied_coupon }}" applied</p>
-								<a href="/viewcart/" class="cart-btn">Remove</a>
+								<a href="/removecoupon/" class="cart-btn">Remove</a>
 							{% endif %}
 						</form>
 						
@@ -112,7 +122,53 @@
 			</div>
 		</div>
 	</div>
-</div>    
+</div> 	
+
+<script>
+	function updateQuantity(cartItemId, newQuantity) {
+		var csrftoken = getCookie('csrftoken');
+	
+		$.ajax({
+			url: '/updatecart/',
+			type: 'POST',
+			headers: {
+				'X-CSRFToken': csrftoken
+			},
+			data: {
+				'cart_item_id': cartItemId,
+				'new_quantity': newQuantity
+			},
+			success: function(response) {
+				if (response.success) {
+					document.getElementById('subtotal').innerText = '₹' + response.total_amount.toFixed(2);
+					document.getElementById('total').innerText = '₹' + response.total_amount.toFixed(2);
+				} else {
+					alert('Failed to update quantity.');
+				}
+			},
+			error: function() {
+				alert('Failed to update quantity. Please try again later.');
+			}
+		});
+	}
+	
+	function getCookie(name) {
+		var cookieValue = null;
+		if (document.cookie && document.cookie !== '') {
+			var cookies = document.cookie.split(';');
+			for (var i = 0; i < cookies.length; i++) {
+				var cookie = cookies[i].trim();
+				if (cookie.substring(0, name.length + 1) === (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					break;
+				}
+			}
+		}
+		return cookieValue;
+	}
+	</script>
+	
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

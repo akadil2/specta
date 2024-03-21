@@ -43,9 +43,16 @@
                 <div class="form-group row">
                     <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Category</label>
                     <div class="col-sm-9">
-                        <select name="category" required>                            
+                        <!-- <select name="category" required>                            
                              {% for category in categories %} 
                                 <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select> -->
+                        <select name="category" required>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category.id == item.category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -76,20 +83,7 @@
                     </div>
                 </div>
                 
-                <!-- <div class="form-group row">
-                    <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Image</label>
-                    <div class="col-sm-9">
-                        <input type="file" class="form-control" id="" value="{{item.image.url}}" name="image" accept="image/*">    
-                    </div>
-                    <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Image1</label>
-                    <div class="col-sm-9">
-                        <input type="file" class="form-control" id="" value="{{item.image1.url}}" name="image1" accept="image/*">    
-                    </div>
-                    <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Image2</label>
-                    <div class="col-sm-9">
-                        <input type="file" class="form-control" id="" value="{{item.image2.url}}" name="image2" accept="image/*">    
-                    </div>
-                </div> -->
+               
                 <button type="submit" class="btn btn-primary mr-2">Update</button>
                 <a class="btn btn-secondary" href="/productmanage/">Back</a>
             </form>

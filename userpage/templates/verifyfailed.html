@@ -1,1 +1,24 @@
-<h4>failedd</h4>
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Failed{%endblock%}
+{%block heading%}Failed!!{%endblock%}
+{%block table%}
+
+<div class="full-height-section error-section">
+    <div class="full-height-tablecell">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2 text-center">
+                    <div class="error-text">
+                        <i class="far fa-sad-cry"></i>
+                        <h1>Oops! .</h1>
+                        <p>Your Email verification failed.</p>
+                        <a href="/signup/" class="boxed-btn">Back to Signup</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end error section -->
+{%endblock%}

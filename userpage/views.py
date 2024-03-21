@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,get_user_model,update_session_auth_hash
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from .models import Customer,Address
 from django.core.mail import send_mail
 from django.conf import settings
@@ -42,12 +43,12 @@ def signin(request):
                 login(request, user)
                 return redirect('home')
             else:
-                if user.is_blocked:
-                    messages.error(request, 'Your account is blocked. Please contact support.')
-                else:
-                    messages.error(request, 'Invalid Credentials!!')
+                messages.error(request, 'Your account is blocked. Please contact support.')
+        else:
+            messages.error(request, 'Invalid username or password.')
 
     return render(request, 'login.html')
+
 
 # views for new user signup #
 def generate_otp():
@@ -140,7 +141,7 @@ def verifyEmail(request, user_id):
 
     return render(request, 'verifyemail.html', {'user': user})
 
-
+@login_required(login_url='/login/')
 def forgotPassword(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -215,6 +216,7 @@ def logOut(request):
         logout(request)
     return redirect('home')
 
+@login_required(login_url='/login/')
 def userProfile(request):    
     user= request.user
     if request.method == 'POST':
@@ -231,6 +233,7 @@ def userProfile(request):
 
     return render(request,'userprofile.html', {'user':user})
 
+@login_required(login_url='/login/')
 def editAddress(request, ad_id):    
     address = Address.objects.get(pk=ad_id)
 
@@ -257,13 +260,16 @@ def editAddress(request, ad_id):
 
     return render(request, 'address.html', {'address': address})
 
+@login_required(login_url='/login/')
 def editProfile(request):
     return render(request,'editprofile.html')
 
+@login_required(login_url='/login/')
 def userAddress(request):
     addres = Address.objects.filter(user=request.user)
     return render(request, 'address.html', {'addres': addres})
 
+@login_required(login_url='/login/')
 def newAddress(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -282,11 +288,13 @@ def newAddress(request):
 
     return render(request,'newaddress.html')
 
+@login_required(login_url='/login/')
 def deleteAddress(request,ad_id):
     adress = Address.objects.filter(pk=ad_id).delete()
     messages.success(request, 'Address deleted')
     return redirect('address')
 
+@login_required(login_url='/login/')
 def changePassword(request):
     if request.method == 'POST':
         current_password = request.POST.get('currentpassword')

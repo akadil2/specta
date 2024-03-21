@@ -1,0 +1,40 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Wallet{%endblock%}
+{%block heading%}Wallet{%endblock%}
+{%block table%}
+<div class="cart-section mt-150 mb-150">
+	<div class="container">
+		<div class="col-12">
+		
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+					<table class="cart-table">
+						<thead class="cart-table-head">
+							{% if user.is_authenticated %}
+                                <h3>Your Wallet Balance: {{ wallet_balance }}</h3>
+                            
+                            {% endif %}
+							
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="col-lg-4">
+				<div class="total-section">
+					
+					<div class="cart-buttons">
+						<a href="/allproducts/" class="boxed-btn">Continue Shopping</a>
+                        
+						
+					</div>
+				</div>
+
+				
+			</div>
+		</div>
+	</div>
+</div>    
+{%endblock%}

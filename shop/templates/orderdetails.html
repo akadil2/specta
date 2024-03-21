@@ -1,0 +1,60 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block title%}Orders{%endblock%}
+{%block heading%}Orders{%endblock%}
+{%block table%} 
+<div class="cart-section mt-150 mb-150">
+	<div class="container">
+        {% for message in messages %}
+                        <h6 style="color: rgb(12, 86, 26);">{{message}} </h6>
+                        {% endfor %}
+		<div class="row">
+			<div class="col-lg-8 col-md-12">
+				<div class="cart-table-wrap">
+					<table class="cart-table">
+                        <thead class="cart-table-head">
+                            <tr class="table-head-row">                                
+                                <th class="product-image">Order ID</th>
+                                <th class="product-name">Product Name</th>
+                                <th class="product-quantity">Quantity</th>                        
+                                <th class="product-price">Price</th>
+                                <th class="product-price">Discount</th>                                
+                                <th class="product-remove">Total</th>
+                                <th class="product-remove">Payment Mode</th>
+                                <th></th>  <!-- Empty column for action links -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                {% for order_item in order.orderitem_set.all %}
+                                    <tr class="table-body-row">
+                                        {% if forloop.first %}  <!-- Display order ID only for the first item -->
+                                            <td class="product-image" rowspan="{{ order.orderitem_set.count }}">{{ order.id }}</td>
+                                        {% endif %}
+                                        <td class="product-name">{{ order_item.product.name }}</td>
+                                        <td class="product-image">{{ order_item.quantity }}</td>
+                                        <td class="product-price">{{ order_item.product.price }}</td>
+                                        <td class="product-quantity">{{ order.discount_amount }}</td>
+                                        <td class="product-remove">{{ order.total_price }}</td>
+                                        <td class="product-remove">{{ order.payment_method }}</td>
+                                        {% if forloop.first %}  <!-- Only display action link for the first item -->
+                                            <td>
+                                                <a href="/invoicepdf/{{ order.id }}">Print Invoice</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    
+                    <div class="cart-buttons">
+						<a href="/allproducts/" class="boxed-btn">Continue Shopping</a>						
+					</div>
+				</div>
+			</div>
+        </div>
+    </div>
+ </div>   
+{%endblock%}

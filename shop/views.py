@@ -1,15 +1,29 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from shop.models import Product,Category,Cart,Order,OrderItem,Wishlist,Coupon
-from userpage.models import Address
+from userpage.models import Address,Wallet
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 import razorpay
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
+from decimal import Decimal
+from django.views.decorators.cache import never_cache
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph,Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
+from django.template.defaultfilters import floatformat
+from reportlab.lib.units import inch
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Sum,F
+
+
 
 #all product view
 def allProducts(request):
-    prod_list = Product.objects.all()
-    paginator = Paginator(prod_list, 6) 
+    prod_list = Product.objects.all().order_by('-id')
+    paginator = Paginator(prod_list, 9) 
 
     page = request.GET.get('page')
     try:
@@ -59,7 +73,6 @@ def addtoWishlist(request, product_id):
                 Wishlist.objects.create(user=user, product=product)
                 message = 'Product added to the wishlist.'
 
-            # Return a JSON response with the success message
             return JsonResponse({'message': message})
         else:            
             return JsonResponse({'error': 'Invalid request method.'}, status=400)
@@ -88,22 +101,51 @@ def addtoCart(request, product_id):
         cart_item = Cart.objects.filter(user=user, product=product)
 
         if cart_item.exists():           
-            cart_item = cart_item.first()
-            cart_item.quantity += quantity
-            cart_item.save()
+            messages.info(request,'Product already in Cart')
+    
+
         else:            
             Cart.objects.create(user=user, product=product, quantity=quantity)
         
+        if 'wishlist' in request.headers.get('Referer', ''):
+                wishlist_item = Wishlist.objects.filter(product=product, user=user).first()
+                if wishlist_item:
+                    # Delete the product from the wishlist
+                    wishlist_item.delete()
+
         return redirect('viewcart')
 
     return redirect('login')
 
+
+@csrf_exempt
+def updateCart(request):
+    if request.method == 'POST':
+        cart_item_id = request.POST.get('cart_item_id')
+        new_quantity = int(request.POST.get('new_quantity'))
+
+        try:
+            cart_item = Cart.objects.get(pk=cart_item_id)
+            cart_item.quantity = new_quantity
+            cart_item.save()
+
+            user = request.user
+            cart = Cart.objects.filter(user=user)
+            
+            total_amount = cart.aggregate(total_amount=Sum(F('product__price') * F('quantity')))['total_amount']
+
+
+            return JsonResponse({'success': True, 'total_amount': total_amount})
+        except Cart.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Cart item does not exist'})
 
 def viewCart(request): 
     if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.filter(user=user)
         total_amount = sum(item.calculate_total_amount() for item in cart)
+       
+
 
         coupon_code = request.POST.get('coupon')
         applied_coupon = None
@@ -118,16 +160,24 @@ def viewCart(request):
                     request.session['discounted_amount'] = coupon.discount_amount
             except Coupon.DoesNotExist:
                 messages.warning(request, 'Invalid coupon code.')
-
-        context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon}
+        discounted_amount = request.session.get('discounted_amount',0)
+        context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon, 'discounted_amount':discounted_amount}
         return render(request, 'cart.html', context)
 
     return redirect('login')
 
 #deleting products in cart
-def deleteCartItem(reqeust,item_id):
+def deleteCartItem(request,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
+    if 'discounted_amount' in request.session:
+     del request.session['discounted_amount']
     return redirect('viewcart')
+
+def removeCoupon(request):
+    if 'discounted_amount' in request.session:
+     del request.session['discounted_amount']
+    return redirect('viewcart')
+
 
 #view checkout pge
 def checkOut(request):    
@@ -164,14 +214,13 @@ def addnewAddress(request):
     return render(request,'addnewaddress.html')
 
      
-from decimal import Decimal
 
+@never_cache
 def processOrder(request):
     user = request.user
     cart_items = Cart.objects.filter(user=user)
     total_amount = sum(item.product.price * item.quantity for item in cart_items)
 
-    # Retrieve the discount amount from the session without removing it
     discount_amount = request.session.pop('discounted_amount', 0)
 
     if request.method == 'POST':
@@ -182,9 +231,19 @@ def processOrder(request):
             messages.error(request, "Please select an address.")
             return redirect('checkout')         
         
-        # Calculate the total price with the discount
         total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
 
+        if 'pay_with_wallet' in request.POST:  
+            wallet = Wallet.objects.get(user=user) 
+
+            if wallet.balance >= total_price_with_discount:
+                wallet.balance -= Decimal(total_price_with_discount)
+                wallet.save()
+                payment_method = 'WALLET'
+            else:
+                messages.error(request, "Insufficient balance in wallet.")
+                return redirect('checkout')
+        
         order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
         
         for cart_item in cart_items:
@@ -204,44 +263,7 @@ def processOrder(request):
     return render(request, 'checkout.html')
 
 
-def razorpayOrder(request):
-    user = request.user
-    cart_items = Cart.objects.filter(user=user)
-    total_amount = sum(item.product.price * item.quantity for item in cart_items)
-    discount_amount = request.session.pop('discounted_amount', 0)
-
-    if request.method == 'POST':
-        selected_address_id = request.POST.get('selected_address')
-        payment_method = request.POST.get('payment_method')
-        client = razorpay.Client(auth=("rzp_test_wtY6GWGahBxiu9", "DYOIyhDEEQYis7V5nVo2IeB7"))
-        data = { "amount": total_amount*100, "currency": "INR", "receipt": '1' }
-        payment = client.order.create(data=data)
-
-        if not selected_address_id:
-            messages.error(request, "Please select an address.")
-            return redirect('checkout')
-        
-        total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
-
-        order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
-        
-       
-        for cart_item in cart_items:
-            OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
-          
-            cart_item.product.stock -= cart_item.quantity
-            cart_item.product.save()
-        
-        selected_address = Address.objects.get(pk=selected_address_id)
-        order.address = selected_address
-        order.save()
-
-        Cart.objects.filter(user=user).delete()        
-        
-        return redirect('ordersuccess')
-
-    return render(request, 'checkout.html')
-
+    
 def orderSuccess(request):
     return render(request,'ordersuccess.html')   
 
@@ -252,16 +274,128 @@ def viewOrders(request):
     context = {'orders': orders}
     return render(request, 'orders.html', context)
 
+def orderDetails(request,order_id):
+    user = request.user
+    orders = Order.objects.filter(pk=order_id)
+
+    context = {'user':user, 'orders':orders}
+    return render(request,'orderdetails.html',context)
+
+
+
+def invoicePdf(request, order_id):
+    try:
+        order = Order.objects.get(pk=order_id)
+    except Order.DoesNotExist:
+        return HttpResponse("Order not found", status=404)
+
+    # Create a buffer for the PDF content
+    buffer = BytesIO()
+
+    # Create a PDF document
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+    # Define styles
+    styles = getSampleStyleSheet()
+    normal_style = styles["Normal"]
+
+    # Populate PDF content
+    content = []
+
+    # Shop Details
+    content.append(Paragraph("<h1>Invoice</h1>", normal_style))
+    content.append(Paragraph("<strong>Specta</strong>", normal_style))
+    content.append(Paragraph("12b, Calicut", normal_style))
+    content.append(Paragraph("info@specta.com", normal_style))
+    content.append(Paragraph("<br/><br/>", normal_style))  # Add space between sections
+
+    # User Details
+    content.append(Paragraph("<h2>Customer Details:</h2>", normal_style))
+    if order.address:
+        content.append(Paragraph(f"<strong>Customer Name:</strong> {order.address.name}", normal_style))
+        content.append(Paragraph(f"<strong>Address:</strong> {order.address.house_name}, {order.address.city}, {order.address.pin_code}", normal_style))
+        content.append(Paragraph(f"<strong>Phone:</strong> {order.address.phone}", normal_style))
+    else:
+        content.append(Paragraph("<strong>No address available for this order</strong>", normal_style))
+    content.append(Paragraph("<br/><br/>", normal_style))  # Add space between sections
+
+    # Invoice Details Table
+    table_data = [
+        ["Date", "Order ID", "Product Name", "Quantity", "Price", "Discount", "Total"]
+    ]
+
+    for order_item in order.orderitem_set.all():  # Access through the intermediate model
+        product_name = order_item.product.name
+        product_price = order_item.product.price
+        quantity = order_item.quantity
+        total_amount = product_price * quantity
+        
+        # Add item details to table data
+        table_data.append([
+            order.created_at.strftime('%Y-%m-%d'),
+            order.id,
+            product_name,
+            quantity,
+            f"{floatformat(product_price, -2)}",
+            f"{floatformat(order.discount_amount, -2)}",
+            f"{floatformat(total_amount, -2)}"
+        ])
+
+    total_price_row = ["", "", "", "", "", "Total Price", f"Rs.{order.total_price}"]
+    table_data.append(total_price_row)
+
+    table_style = [
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, 'BLACK')
+    ]
+
+    # Create invoice details table
+    invoice_table = Table(table_data)
+    invoice_table.setStyle(TableStyle(table_style))
+
+    # Add invoice details table to content
+    content.append(invoice_table)
+
+    # Build PDF document
+    doc.build(content)
+
+    # Get the PDF content from the buffer
+    pdf_data = buffer.getvalue()
+    buffer.close()
+
+    # Create HTTP response with PDF content
+    response = HttpResponse(pdf_data, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order_id}.pdf"'
+
+    return response
+
 def cancelOrder(request,item_id):
     item = OrderItem.objects.get(pk=item_id)
-    item.status ='cancelled'
-    item.save()
+    if item.status != 'cancelled':  
+        item.status = 'cancelled'
+        item.save()
+
+        if item.order.payment_method!='COD':
+            user = item.order.user
+            cancelled_amount = Decimal(item.calculate_amount())
+
+            wallet, created = Wallet.objects.get_or_create(user=user)
+            wallet.balance += cancelled_amount
+            wallet.save()
+
+            messages.success(request, f'Amount of {cancelled_amount} added to your wallet.')
 
     return redirect('vieworders')
+   
 
 def requestReturn(request,item_id):
     item = OrderItem.objects.get(pk=item_id)
-    item.status = 'return_requested'
+    if item.status == OrderItem.DELIVERED:
+        item.status = OrderItem.RETURN_REQUESTED
+        item.save()
+    
     return redirect('vieworders')
 
 
@@ -292,3 +426,20 @@ def productSearch(request):
     }
 
     return render(request, 'searchresult.html', context)
+
+def userWallet(request):
+    if request.user.is_authenticated:
+        # Retrieve the wallet balance for the current user
+        wallet = Wallet.objects.filter(user=request.user).first()
+
+        # Pass the wallet balance to the template context
+        context = {
+            'wallet_balance': wallet.balance if wallet else 0.0,
+        }
+    
+        
+
+    return render(request,'wallet.html',context)
+
+def aboutPage(request):
+    return render(request,'about.html')

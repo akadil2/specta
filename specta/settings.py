@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+# dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k#pi#9yx!eh=-k+2z6j$@_9ngvrzgx3@zf9=c4mod7l3uu4tk6'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,14 +80,24 @@ WSGI_APPLICATION = 'specta.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'project1',
+#        'USER': 'postgres',
+#        'PASSWORD': 'adil@123',
+#        'HOST': 'localhost',
+#        'PORT': '5432',
+#     }
+# }
 DATABASES = {
     'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'project1',
-       'USER': 'postgres',
-       'PASSWORD': 'adil@123',
-       'HOST': 'localhost',
-       'PORT': '5432',
+       'ENGINE': os.environ.get('DATABASE_ENGINE'),
+       'NAME': os.environ.get('DATABASE_NAME'),
+       'USER': os.environ.get('DATABASE_USER'),
+       'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+       'HOST': os.environ.get('DATABASE_HOST'),
+       'PORT': os.environ.get('DATABASE_PORT'),
     }
 }
 
@@ -148,10 +162,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mail2adilyo@gmail.com'
-EMAIL_HOST_PASSWORD = 'mgiv vksd zwvr xait'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
-RAZOR_KEY_ID = 'rzp_test_wtY6GWGahBxiu9'
-RAZOR_KEY_SECRET = 'DYOIyhDEEQYis7V5nVo2IeB7'
+RAZOR_KEY_ID = os.environ.get('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = os.environ.get('RAZOR_KEY_SECRET')
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

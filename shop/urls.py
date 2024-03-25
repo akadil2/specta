@@ -17,7 +17,6 @@ urlpatterns = [
     path('checkout/', views.checkOut, name='checkout'),
     path('addnewaddress/',views.addnewAddress, name='addnewaddress'),
     path('processorder/', views.processOrder, name='processorder'),
-    # path('razorpayorder/',views.razorpayOrder,name='razorpayorder'),
     path('ordersuccess/', views.orderSuccess, name='ordersuccess'),
     path('vieworders/', views.viewOrders, name='vieworders'),
     path('orderdetails/<int:order_id>/', views.orderDetails, name='orderdetails'),

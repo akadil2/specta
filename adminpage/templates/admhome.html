@@ -4,87 +4,77 @@
 <html lang="en">
 
 <head>
+  <style>
+    .logo-img {
+      max-width: 150px; /* Adjust this value as needed */
+      height: auto;
+    }
+    
+  </style>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Admin Home</title>
-  <!-- plugins:css -->
+ 
   <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="vendors/base/vendor.bundle.base.css"> 
-  <!-- endinject -->
-  <!-- plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
+ 
   <link rel="stylesheet" href="{%static 'css/style.css' %}">
-  <!-- endinject -->
+  
   <link rel="shortcut icon" href="stimages/favicon.png" />
 </head>
 <body>
-  <div class="container-scroller">
-    
-    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row" style="background-color: #07212e;">
- 
-    </nav>
-    
-    
-    <div class="container-fluid page-body-wrapper" style="background-color: #07212e;">
-      <!-- partial:partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <ul class="nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/adminhome/">
-              <i class="ti-shield menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/usermanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">User Management</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/productmanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Products</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/categorymanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Catagories</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/ordermanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Orders</span>
-            </a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Return</span>
-            </a>
-          </li> -->
-          <li class="nav-item">
-            <a class="nav-link" href="/couponmanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Coupons</span>
-            </a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Banners</span>
-            </a>
-          </li> -->
-          <li>
-            <a class="btn btn-danger" href="/adminlogout/">logout</a>
-          </li>
-        </ul>
-      </nav>
+  
+      <div class="container-scroller">
+   
+          <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand">
+              <img src="{% static 'img/spectalogo.png' %}" alt="" class="logo-img">
+            </span>
+            
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="/adminhome/">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/usermanage/">User Management</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/productmanage/">Products</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/categorymanage/">Categories</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/ordermanage/">Orders</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/couponmanage/">Coupons</a>
+                </li>
+                <li class="nav-item">
+                  <a class="btn btn-danger" href="/adminlogout/">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+          <div class="container-fluid page-body-wrapper" >
+          
+          <!-- Sidebar -->
+          <nav class="col-md-2 d-md-block " id="sidebar" style="background-color: #dddce1;">
+            <div class="sidebar-sticky">
+              <div class="sidebar-brand-brand">
+                
+              </div>
+              
+            </div>
+          </nav>
       <!-- partial -->
+      
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
@@ -140,18 +130,7 @@
                 </div>
               </div>
             </div>
-            <!-- <div class="col-md-3 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Returns</p>
-                  <div class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">61344</h3>
-                    <i class="ti-layers-alt icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-                  </div>  
-                  <p class="mb-0 mt-2 text-success">23.00%<span class="text-black ml-1"><small>(30 days)</small></span></p>
-                </div>
-              </div>
-            </div> -->
+            
           </div>
           <div class="col-lg-6 grid-margin stretch-card">
             <div class="card">
@@ -163,92 +142,7 @@
           </div>
 
           
-                    <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card position-relative">
-                <div class="card-body">
-                  <p class="card-title">Detailed Reports</p>
-                  <div class="row">
-                    <div class="col-md-12 col-xl-3 d-flex flex-column justify-content-center">
-                      <div class="ml-xl-4">
-                        <h1>33500</h1>
-                        <h3 class="font-weight-light mb-xl-4">Sales</h3>
-                        <p class="text-muted mb-2 mb-xl-0">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-                      </div>  
-                    </div>
-                    <div class="col-md-12 col-xl-9">
-                      <div class="row">
-                        <div class="col-md-6 mt-3 col-xl-5">
-                          <canvas id="north-america-chart"></canvas>
-                          <div id="north-america-legend"></div>
-                        </div>
-                        <div class="col-md-6 col-xl-7">
-                          <div class="table-responsive mb-3 mb-md-0">
-                            <table class="table table-borderless report-table">
-                              <tr>
-                                <td class="text-muted">Illinois</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">524</h5></td>
-                              </tr>
-                              <tr>
-                                <td class="text-muted">Washington</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">722</h5></td>
-                              </tr>
-                              <tr>
-                                <td class="text-muted">Mississippi</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">173</h5></td>
-                              </tr>
-                              <tr>
-                                <td class="text-muted">California</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">945</h5></td>
-                              </tr>
-                              <tr>
-                                <td class="text-muted">Maryland</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">553</h5></td>
-                              </tr>
-                              <tr>
-                                <td class="text-muted">Alaska</td>
-                                <td class="w-100 px-0">
-                                  <div class="progress progress-md mx-4">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                </td>
-                                <td><h5 class="font-weight-bold mb-0">912</h5></td>
-                              </tr>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                   
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
@@ -275,11 +169,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <canvas id="salesChart" width="400" height="200"></canvas>
+  <!-- jQuery (required for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 
 
   <!-- End plugin js for this page-->
   <!-- inject:js -->
-  <script src="js/off-canvas.js"></script>
+  <script src="{%static 'js/off-canvas.js' %}"></script>
   <script src="js/hoverable-collapse.js"></script>
   <script src="js/template.js"></script>
   <script src="js/todolist.js"></script>

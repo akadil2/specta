@@ -13,8 +13,7 @@ from reportlab.pdfgen import canvas
 
 
  
-# Create your views here.
-    
+# Admin homepage view.
 def adminHome(request, period='month'):
     if request.user.is_authenticated and request.user.is_superuser:
         today = timezone.now()
@@ -35,6 +34,7 @@ def adminHome(request, period='month'):
         return render(request, 'admhome.html', context)
     return redirect('login')
 
+#for sales report in admin home
 def salesReport(request, period='day'):
     if request.user.is_authenticated and request.user.is_superuser:
         today = timezone.now()
@@ -77,6 +77,7 @@ def salesReport(request, period='day'):
         return render(request, 'salesreport.html', context)
     return redirect('login')
 
+#for printing report
 def generatePdf(request):
     today = timezone.now()
     start_date_str = request.GET.get('start_date')
@@ -133,8 +134,10 @@ def generatePdf(request):
     p.save()
 
     return response
+#admin homepage view ends.
 
 
+#views for user details in admin page
 def userManage(request):
         if request.user.is_authenticated and request.user.is_superuser:
             cust = Customer.objects.filter(is_superuser=False, is_admin=False)
@@ -153,7 +156,10 @@ def userStatus(request,user_id):
         user.save()
         return redirect('usermanage')
     return redirect('login')
+#user details ends.
 
+
+#product deatils view
 def productManage(request):
         if request.user.is_authenticated and request.user.is_superuser:
             prod = Product.objects.all().order_by('-id')
@@ -236,8 +242,10 @@ def editProduct(request,item_id):
                 return redirect("productmanage")
 
         return render(request, 'editproduct.html', {'categories': categories, 'item': item})
+#Admin side products view ends here.
 
 
+#Admin side category views
 def categoryManage(request):
         if request.user.is_authenticated and request.user.is_superuser:        
             cat = Category.objects.all().order_by('-id')
@@ -287,14 +295,15 @@ def editCategory(request, item_id):
 
     return render(request, 'editcategory.html', {'item': category})
 
-
 def deleteCategory(request,item_id):
         if request.user.is_authenticated and request.user.is_superuser:
             item = Category.objects.filter(pk=item_id).delete()
             return redirect('categorymanage')
         return redirect('login')
-       
+#admin side category views ends here.       
 
+
+#Admin side order detail views
 def orderManage(request):
         if request.user.is_authenticated and request.user.is_superuser:
             orders = OrderItem.objects.all().order_by('-id')
@@ -358,8 +367,10 @@ def acceptReturn(request,order_id):
             messages.success(request, f'Amount of {returned_amount} added to your wallet.')
 
     return redirect('ordermanage')
-      
+#admin side order viewa ends here.      
 
+
+#coupon views 
 def couponManage(request):
       if request.user.is_authenticated and request.user.is_superuser:
         coupon = Coupon.objects.all().order_by('-id')
@@ -385,6 +396,8 @@ def addCoupon(request):
           coupon.save()
           return redirect('couponmanage')
       return render(request,'addcoupon.html')
+#admin side coupon views ends here.
+
 
 def admLogout(request):
        if request.user.is_authenticated:

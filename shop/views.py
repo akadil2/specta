@@ -83,8 +83,9 @@ def addtoWishlist(request, product_id):
 def deleteWishlist(requst,product_id):
     item = Wishlist.objects.filter(pk=product_id).delete()
     return redirect('wishlist')
+#wishlsit view ends here.
 
-#view for adding product to cart 
+#cart relaated views 
 def addtoCart(request, product_id):
     if request.user.is_authenticated:
      product = Product.objects.get(pk=product_id)
@@ -166,7 +167,6 @@ def viewCart(request):
 
     return redirect('login')
 
-#deleting products in cart
 def deleteCartItem(request,item_id):
     item = Cart.objects.filter(pk=item_id).delete()
     if 'discounted_amount' in request.session:
@@ -177,9 +177,10 @@ def removeCoupon(request):
     if 'discounted_amount' in request.session:
      del request.session['discounted_amount']
     return redirect('viewcart')
+#cart related views ends here.
 
 
-#view checkout pge
+#views for checkout products from carts
 def checkOut(request):    
     user = request.user
     cart = Cart.objects.filter(user=user)
@@ -261,12 +262,13 @@ def processOrder(request):
         return redirect('ordersuccess')
 
     return render(request, 'checkout.html')
-
+#checkout views ends here.
 
     
 def orderSuccess(request):
     return render(request,'ordersuccess.html')   
 
+#user side order views
 def viewOrders(request):
     user = request.user
     orders = Order.objects.filter(user=user).order_by('-id')
@@ -426,6 +428,8 @@ def productSearch(request):
     }
 
     return render(request, 'searchresult.html', context)
+#userside order views ends here.
+
 
 def userWallet(request):
     if request.user.is_authenticated:

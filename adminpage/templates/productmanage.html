@@ -15,79 +15,66 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <!-- endinject -->
   <link rel="shortcut icon" href="../../images/favicon.png" />
+  <style>
+    .logo-img {
+      max-width: 150px; /* Adjust this value as needed */
+      height: auto;
+    }
+    
+  </style>
 </head>
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
-    
-    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <span class="navbar-brand">
+        <img src="{% static 'img/spectalogo.png' %}" alt="" class="logo-img">
+      </span>
+      
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/adminhome/">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/usermanage/">User Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/productmanage/">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/categorymanage/">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/ordermanage/">Orders</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/couponmanage/">Coupons</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-danger" href="/adminlogout/">Logout</a>
+          </li>
+        </ul>
+      </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:../../partials/_sidebar.html -->
       
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <ul class="nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/adminhome/">
-              <i class="ti-shield menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/usermanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">User Management</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/productmanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Products</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/categorymanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Catagories</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/ordermanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Orders</span>
-            </a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Return</span>
-            </a>
-          </li> -->
-          <li class="nav-item">
-            <a class="nav-link" href="/couponmanage/">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Coupons</span>
-            </a>
-          </li>
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Banners</span>
-            </a>
-          </li> -->
-          <li>
-            <a class="btn btn-danger" href="/adminlogout/">logout</a>
-          </li>
-        </ul>
+        
       </nav>
       
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
+            <div class="col-sm-12">
+              <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+        </div>
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
@@ -165,6 +152,12 @@
     </div>
     <!-- page-body-wrapper ends -->
   </div>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   <!-- container-scroller -->
   <!-- plugins:js -->
   <script src="../../vendors/base/vendor.bundle.base.js' %}"></script>
@@ -176,9 +169,16 @@
   <script src="{% static 'js/hoverable-collapse.js' %}"></script>
   <script src="{% static 'js/template.js' %}"></script>
   <script src="{% static 'js/todolist.js' %}"></script>
-  <!-- endinject -->
-  <!-- Custom js for this page-->
-  <!-- End custom js for this page-->
-</body>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+</script>
 
 </html>

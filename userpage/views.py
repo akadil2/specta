@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout,get_user_model,update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Customer,Address
+from userpage.models import Customer,Address
 from django.core.mail import send_mail
 from django.conf import settings
 import random
@@ -209,6 +209,7 @@ def resetPassword(request, user_id):
             messages.error(request, 'Passwords do not match. Please try again.')
 
     return render(request, 'resetpassword.html', {'user_id': user_id})
+#user login related views ends here.
 
 
 def logOut(request):
@@ -216,6 +217,7 @@ def logOut(request):
         logout(request)
     return redirect('home')
 
+#user profile related views
 @login_required(login_url='/login/')
 def userProfile(request):    
     user= request.user
@@ -319,6 +321,6 @@ def changePassword(request):
             messages.error(request, 'Current password is incorrect.')
 
     return render(request, 'changepassword.html')
-
+#user account related views ends here.
  
         

@@ -160,3 +160,5 @@ RAZOR_KEY_ID = os.environ.get('RAZOR_KEY_ID')
 RAZOR_KEY_SECRET = os.environ.get('RAZOR_KEY_SECRET')
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
+CSRF_TRUSTED_ORIGINS = ['https://15.207.84.64', 'https://specta.akadil.site', 'https://www.specta.akadil.site']

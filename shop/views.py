@@ -234,9 +234,9 @@ def processOrder(request):
         
         total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
 
-        if 'pay_with_wallet' in request.POST:  
-            wallet = Wallet.objects.get(user=user) 
+        wallet, created = Wallet.objects.get_or_create(user=user) 
 
+        if 'pay_with_wallet' in request.POST:  
             if wallet.balance >= total_price_with_discount:
                 wallet.balance -= Decimal(total_price_with_discount)
                 wallet.save()

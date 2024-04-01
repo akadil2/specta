@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Orders</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="../../vendors/base/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- inject:css --> 
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="../../images/favicon.png" />
+  <style>
+    .logo-img {
+      max-width: 150px; /* Adjust this value as needed */
+      height: auto;
+    }
+    
+  </style>
+ 
+</head>
+
+<body>
+  <div class="container-scroller">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <span class="navbar-brand">
+        <img src="{% static 'img/spectalogo.png' %}" alt="" class="logo-img">
+      </span>
+      
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/adminhome/">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/usermanage/">User Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/productmanage/">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/categorymanage/">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/ordermanage/">Orders</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/couponmanage/">Coupons</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-danger" href="/adminlogout/">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_sidebar.html -->
+      
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        
+      </nav>
+      
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="row">
+                <div class="col-md-7 grid-margin stretch-card">
+                    <div class="card">
+                      <div class="card-body">
+                        
+                        <div class="table-responsive">
+                          <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_item in order_items %}
+                                <tr>
+                                    <td>{{ order.id }}</td>
+                                    <td>{{ order_item.product.name }}</td>
+                                    <td>{{ order_item.quantity }}</td>
+                                    <td>{{ order_item.price_at_order }}</td>                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-5 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">                                          
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                    <th>Payment Method</th>
+                                    <th>Discount</th>
+                                    <th>Bill Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                    <td>{{ order.payment_method }}</td>
+                                    <td>{{ order.discount_amount }}</td>
+                                    <td>{{ order.total_price }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                  </div>
+             </div>
+                
+    
+               
+    
+                    <!-- Shipping Address Section -->
+                    <div class="address-wrapper">
+                        <h3>Shipping Address</h3>
+                        <p>
+                            Name: {{ order.shipping_address.name }} <br>
+                            House Name: {{ order.shipping_address.house_name }} <br>
+                            Phone: {{ order.shipping_address.phone }} <br>
+                            Post: {{ order.shipping_address.post }} <br>
+                            City: {{ order.shipping_address.city }} <br>
+                            Pin Code: {{ order.shipping_address.pin_code }} <br>
+                            State: {{ order.shipping_address.state }} <br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Footer Section -->
+        <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                <i class="ti-heart text-danger ml-1"></i></span>
+            </div>
+        </footer>
+    </div>
+    
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+ </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="../../vendors/base/vendor.bundle.base.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{% static 'js/off-canvas.js' %}"></script>
+  <script src="{% static 'js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'js/template.js' %}"></script>
+  <script src="{% static 'js/todolist.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <!-- End custom js for this page-->
+</body>
+
+</html>
+
+

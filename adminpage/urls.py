@@ -19,8 +19,10 @@ urlpatterns = [
     path('deletecategory/<int:item_id>',views.deleteCategory,name='deletecategory'),
     path('ordermanage/',views.orderManage,name='ordermanage'),
     path('orderstatus/<int:order_id>/', views.orderStatus, name='orderstatus'),
+    path('userorders/<int:order_id>/', views.userOrders, name='userorders'),
     path('acceptreturn/<int:order_id>/', views.acceptReturn, name='acceptreturn'),
     path('couponmanage/',views.couponManage,name='couponmanage'),
+    path('couponstatus/<int:coupon_id>',views.couponStatus,name='couponstatus'),
     path('addcoupon/',views.addCoupon, name='addcoupon'),
     path('adminlogout/',views.admLogout, name='adminlogout')
     

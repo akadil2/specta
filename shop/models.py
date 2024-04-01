@@ -61,27 +61,38 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
+    price_at_order = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     def __str__(self) -> str:
         return f"{self.product.name} - {self.status}"
     
     def calculate_amount(self):
-        return self.quantity * self.product.price
+        return self.quantity * self.price_at_order
 
-
+class ShippingAddress(models.Model):
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, null=True)
+    house_name = models.CharField(max_length=50, null=True)
+    phone = models.CharField(max_length=12, null=True)
+    post = models.CharField(max_length=50, null=True)
+    city = models.CharField(max_length=50, null=True)
+    pin_code = models.CharField(max_length=20, null=True)
+    state = models.CharField(max_length=50, null=True)
 
 class Order(models.Model):
     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     items = models.ManyToManyField(Product, through=OrderItem)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    address = models.ForeignKey('userpage.Address', on_delete=models.SET_NULL, null=True, blank=True)
+    shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, null=True, blank=True)
     payment_method = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return f'Order #{self.pk} by {self.user.username}'
+    
+
     
 class Wishlist(models.Model):
     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -97,6 +108,7 @@ class Coupon(models.Model):
     min_orderamount = models.PositiveIntegerField(default=500)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
 
     def is_valid(self):
         from django.utils import timezone

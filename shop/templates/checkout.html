@@ -102,7 +102,7 @@
                                 <tr class="table-head-row">
                                     <th class="product-image">Select Address</th>
                                     <th class="product-name">Address</th>
-                                    <th class="product-price">Pin</th>
+                                    <!-- <th class="product-price">Pin</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -111,8 +111,9 @@
                                     <td class="product-remove">
                                         <input type="checkbox" name="selected_address" value="{{ addres.id }}">
                                     </td>
-                                    <td class="product-price">{{ addres.house_name }}</td>
-                                    <td class="product-quantity">{{ addres.pin_code }}</td>
+                                    <!-- <td class="product-price">{{ addres.house_name }}</td>
+                                    <td class="product-quantity">{{ addres.pin_code }}</td> -->
+                                    <td class="product-price">{{ addres.name}}, {{ addres.house_name }} <br> {{ addres.city }}, {{ addres.state }} - {{ addres.pin_code }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

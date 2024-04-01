@@ -12,16 +12,17 @@
 			<div class="col-lg-8 col-md-12">
 				<div class="cart-table-wrap">
 					<table class="cart-table">
+                     
                         <thead class="cart-table-head">
                             <tr class="table-head-row">                                
                                 <th class="product-image">Order ID</th>
                                 <th class="product-name">Product Name</th>
                                 <th class="product-quantity">Quantity</th>                        
                                 <th class="product-price">Price</th>
-                                <th class="product-price">Discount</th>                                
-                                <th class="product-remove">Total</th>
+                                <th class="product-remove">Coupon Discount</th>
                                 <th class="product-remove">Payment Mode</th>
-                                <th></th>  <!-- Empty column for action links -->
+                                <th class="product-price">Total</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,19 +34,23 @@
                                         {% endif %}
                                         <td class="product-name">{{ order_item.product.name }}</td>
                                         <td class="product-image">{{ order_item.quantity }}</td>
-                                        <td class="product-price">{{ order_item.product.price }}</td>
-                                        <td class="product-quantity">{{ order.discount_amount }}</td>
-                                        <td class="product-remove">{{ order.total_price }}</td>
-                                        <td class="product-remove">{{ order.payment_method }}</td>
-                                        {% if forloop.first %}  <!-- Only display action link for the first item -->
-                                            <td>
-                                                <a href="/invoicepdf/{{ order.id }}">Print Invoice</a>
-                                            </td>
+                                        <td class="product-price">{{ order_item.price_at_order }}</td>
+                                        {% if forloop.first %}  <!-- Only display total price for the first item -->
+                                            <td class="product-remove" rowspan="{{ order.orderitem_set.count }}">-{{ order.discount_amount }}</td>
+                                            <td class="product-remove" rowspan="{{ order.orderitem_set.count }}">{{ order.payment_method }}</td>
                                         {% endif %}
+                                        {% if forloop.last %}  <!-- Display discount for the last item -->
+                                            <td class="product-quantity">{{ order.total_price }}</td>
+                                            <td><a href="/invoicepdf/{{ order.id }}">Print Invoice</a></td>
+                                        {% endif %}
+                                        
                                     </tr>
+                                    
                                 {% endfor %}
-                            {% endfor %}
+                                
+                            
                         </tbody>
+                        
                     </table>
                     
                     
@@ -54,6 +59,28 @@
 					</div>
 				</div>
 			</div>
+            <div class="col-lg-4">
+				<div class="contact-form-wrap">
+                    <div class="contact-form-box">
+                        <h4><i class="fas fa-map"></i> Shipping Address</h4>                        
+                        <p>
+                            {% if order.shipping_address %}
+                                {{ order.shipping_address.name }}<br>
+                                {{ order.shipping_address.house_name }}<br>
+                                {{ order.shipping_address.phone }}<br>
+                                {{ order.shipping_address.post }}, {{ order.shipping_address.city }}<br>                        
+                                
+                                {{ order.shipping_address.state }}, {{ order.shipping_address.pin_code }}<br>
+                            {% else %}
+                                No shipping address available
+                            {% endif %}
+                            {% endfor %}
+                        </p>
+                    </div>
+                    
+                </div>
+
+            </div>
         </div>
     </div>
  </div>   

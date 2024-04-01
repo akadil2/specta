@@ -78,6 +78,7 @@ def salesReport(request, period='day'):
     return redirect('login')
 
 #for printing report
+@login_required(login_url='/login/')
 def generatePdf(request):
     today = timezone.now()
     start_date_str = request.GET.get('start_date')
@@ -314,7 +315,6 @@ def orderManage(request):
         return redirect('login')
 
 @login_required(login_url='/login/')
-
 def orderStatus(request, order_id):
     order_item = get_object_or_404(OrderItem, pk=order_id)
 
@@ -345,6 +345,16 @@ def orderStatus(request, order_id):
             
     return redirect('ordermanage')
 
+@login_required(login_url='/login/')
+def userOrders(request,order_id):
+    order = get_object_or_404(Order, pk=order_id)
+
+    order_items = order.orderitem_set.all()
+
+    context = {'order':order, 'order_items':order_items}
+    return render(request,'userorders.html',context)
+
+@login_required(login_url='/login/')
 def acceptReturn(request,order_id):
     order_item = get_object_or_404(OrderItem, pk=order_id)
 
@@ -381,6 +391,15 @@ def couponManage(request):
         return render(request, 'couponmanage.html', context)
       return redirect('login')
 
+def couponStatus(request,coupon_id):
+    if request.user.is_authenticated and request.user.is_superuser:
+        coupon = Coupon.objects.get(pk=coupon_id)
+        coupon.is_active = not coupon.is_active
+        coupon.save()
+        return redirect('couponmanage')
+    return redirect('login')
+
+@login_required(login_url='/login/')
 def addCoupon(request):
       if request.method == 'POST':
           code = request.POST.get('code')

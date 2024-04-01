@@ -311,10 +311,11 @@ def changePassword(request):
                 user.set_password(password1)
                 user.save()
 
-                update_session_auth_hash(request, user)
+                # Logout the user after changing the password
+                logout(request)
 
-                messages.success(request, 'Password changed successfully.')
-                return redirect('userprofile')
+                messages.success(request, 'Password changed successfully. Please log in with your new password.')
+                return redirect('login')
             else:
                 messages.error(request, 'New passwords do not match.')
         else:

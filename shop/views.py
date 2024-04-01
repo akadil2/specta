@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from shop.models import Product,Category,Cart,Order,OrderItem,Wishlist,Coupon
+from shop.models import Product,Category,Cart,Order,OrderItem,Wishlist,Coupon,ShippingAddress
 from userpage.models import Address,Wallet
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 import razorpay
 from django.http import JsonResponse,HttpResponse
 from decimal import Decimal
@@ -121,32 +122,33 @@ def addtoCart(request, product_id):
 
 @csrf_exempt
 def updateCart(request):
-    if request.method == 'POST':
-        cart_item_id = request.POST.get('cart_item_id')
-        new_quantity = int(request.POST.get('new_quantity'))
+    if request.user.is_authenticated: 
+        if request.method == 'POST':
+            cart_item_id = request.POST.get('cart_item_id')
+            new_quantity = int(request.POST.get('new_quantity'))
 
-        try:
-            cart_item = Cart.objects.get(pk=cart_item_id)
-            cart_item.quantity = new_quantity
-            cart_item.save()
+            try:
+                cart_item = Cart.objects.get(pk=cart_item_id)
+                cart_item.quantity = new_quantity
+                cart_item.save()
 
-            user = request.user
-            cart = Cart.objects.filter(user=user)
-            
-            total_amount = cart.aggregate(total_amount=Sum(F('product__price') * F('quantity')))['total_amount']
+                user = request.user
+                cart = Cart.objects.filter(user=user)
+                
+                total_amount = cart.aggregate(total_amount=Sum(F('product__price') * F('quantity')))['total_amount']
 
 
-            return JsonResponse({'success': True, 'total_amount': total_amount})
-        except Cart.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Cart item does not exist'})
+                return JsonResponse({'success': True, 'total_amount': total_amount})
+            except Cart.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'Cart item does not exist'})
+    return redirect('login')
 
 def viewCart(request): 
     if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.filter(user=user)
         total_amount = sum(item.calculate_total_amount() for item in cart)
-       
-
+        subtotal = total_amount      
 
         coupon_code = request.POST.get('coupon')
         applied_coupon = None
@@ -155,120 +157,140 @@ def viewCart(request):
             try:
                 coupon = Coupon.objects.get(code=coupon_code)
               
-                if coupon.is_valid() and total_amount >= coupon.min_orderamount:
+                if coupon.is_active and coupon.is_valid() and subtotal >= coupon.min_orderamount:
                     total_amount -= coupon.discount_amount
                     applied_coupon = coupon.code
                     request.session['discounted_amount'] = coupon.discount_amount
             except Coupon.DoesNotExist:
                 messages.warning(request, 'Invalid coupon code.')
         discounted_amount = request.session.get('discounted_amount',0)
-        context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon, 'discounted_amount':discounted_amount}
+        context = {'cart': cart, 'total_amount': total_amount, 'applied_coupon': applied_coupon, 'discounted_amount':discounted_amount, 'subtotal':subtotal}
         return render(request, 'cart.html', context)
 
     return redirect('login')
 
 def deleteCartItem(request,item_id):
-    item = Cart.objects.filter(pk=item_id).delete()
-    if 'discounted_amount' in request.session:
-     del request.session['discounted_amount']
-    return redirect('viewcart')
+    if request.user.is_authenticated:
+        item = Cart.objects.filter(pk=item_id).delete()
+        if 'discounted_amount' in request.session:
+            del request.session['discounted_amount']
+        return redirect('viewcart')
+    return redirect('login')
 
 def removeCoupon(request):
-    if 'discounted_amount' in request.session:
-     del request.session['discounted_amount']
-    return redirect('viewcart')
+    if request.user.is_authenticated:
+        if 'discounted_amount' in request.session:
+         del request.session['discounted_amount']
+        return redirect('viewcart')
+    return redirect('login')
 #cart related views ends here.
 
 
 #views for checkout products from carts
-def checkOut(request):    
-    user = request.user
-    cart = Cart.objects.filter(user=user)
-    discounted_amount = request.session.get('discounted_amount', 0)
-    total_amount = sum(item.product.price * item.quantity for item in cart)
-    total_amount -= discounted_amount
-    addres = Address.objects.filter(user=request.user)
-    context = {'cart':cart,
-               'total_amount':total_amount,
-               'addres':addres}
-    if not cart or any(item.quantity < 1 or item.product.stock < 1 for item in cart):
-        messages.warning(request, 'No products available Please Shop again.')
-        return redirect('viewcart')
+def checkOut(request):
+    if request.user.is_authenticated:    
+        user = request.user
+        cart = Cart.objects.filter(user=user)
+        discounted_amount = request.session.get('discounted_amount', 0)
+        total_amount = sum(item.product.price * item.quantity for item in cart)
+        total_amount -= discounted_amount
+        addres = Address.objects.filter(user=request.user)
+        context = {'cart':cart,
+                'total_amount':total_amount,
+                'addres':addres}
+        if not cart or any(item.quantity < 1 or item.product.stock < 1 for item in cart):
+            messages.warning(request, 'No products available Please Shop again.')
+            return redirect('viewcart')
 
-    return render(request, 'checkout.html', context)
+        return render(request, 'checkout.html', context)
+    return redirect('login')
 
 def addnewAddress(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        hname = request.POST.get('house')        
-        phone = request.POST.get('phone')
-        post = request.POST.get('place')
-        city = request.POST.get('city')
-        pincode = request.POST.get('pin')
-        state = request.POST.get('state')
-        user = request.user
-        
-        adress = Address.objects.create(user=user,name=name,house_name=hname,phone=phone,post=post,city=city,pin_code=pincode,state=state)
-        adress.save()
-        return redirect('checkout')
-        
-    return render(request,'addnewaddress.html')
-
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            hname = request.POST.get('house')        
+            phone = request.POST.get('phone')
+            post = request.POST.get('place')
+            city = request.POST.get('city')
+            pincode = request.POST.get('pin')
+            state = request.POST.get('state')
+            user = request.user
+            
+            adress = Address.objects.create(user=user,name=name,house_name=hname,phone=phone,post=post,city=city,pin_code=pincode,state=state)
+            adress.save()
+            return redirect('checkout')
+            
+        return render(request,'addnewaddress.html')
+    return redirect('login')
      
 
 @never_cache
 def processOrder(request):
-    user = request.user
-    cart_items = Cart.objects.filter(user=user)
-    total_amount = sum(item.product.price * item.quantity for item in cart_items)
+    if request.user.is_authenticated:
+        user = request.user
+        cart_items = Cart.objects.filter(user=user)
+        total_amount = sum(item.product.price * item.quantity for item in cart_items)
 
-    discount_amount = request.session.pop('discounted_amount', 0)
+        discount_amount = request.session.pop('discounted_amount', 0)
 
-    if request.method == 'POST':
-        selected_address_id = request.POST.get('selected_address')
-        payment_method = request.POST.get('payment_method')
+        if request.method == 'POST':
+            selected_address_id = request.POST.get('selected_address')
+            payment_method = request.POST.get('payment_method')
 
-        if not selected_address_id:
-            messages.error(request, "Please select an address.")
-            return redirect('checkout')         
-        
-        total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
-
-        wallet, created = Wallet.objects.get_or_create(user=user) 
-
-        if 'pay_with_wallet' in request.POST:  
-            if wallet.balance >= total_price_with_discount:
-                wallet.balance -= Decimal(total_price_with_discount)
-                wallet.save()
-                payment_method = 'WALLET'
-            else:
-                messages.error(request, "Insufficient balance in wallet.")
-                return redirect('checkout')
-        
-        order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
-        
-        for cart_item in cart_items:
-            OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity)
+            if not selected_address_id:
+                messages.error(request, "Please select an address.")
+                return redirect('checkout')         
             
-            cart_item.product.stock -= cart_item.quantity
-            cart_item.product.save()
-        
-        selected_address = Address.objects.get(pk=selected_address_id)
-        order.address = selected_address
-        order.save()
+            total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
 
-        Cart.objects.filter(user=user).delete()        
-        
-        return redirect('ordersuccess')
+            wallet, created = Wallet.objects.get_or_create(user=user) 
 
-    return render(request, 'checkout.html')
-#checkout views ends here.
+            if 'pay_with_wallet' in request.POST:  
+                if wallet.balance >= total_price_with_discount:
+                    wallet.balance -= total_price_with_discount
+                    wallet.save()
+                    payment_method = 'WALLET'
+                else:
+                    messages.error(request, "Insufficient balance in wallet.")
+                    return redirect('checkout')
+            
+            
+            order = Order.objects.create(user=user, total_price=total_price_with_discount, payment_method=payment_method, discount_amount=discount_amount)
 
-    
+            for cart_item in cart_items:
+                order_item = OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity, price_at_order=cart_item.product.price)
+                    
+                cart_item.product.stock -= cart_item.quantity
+                cart_item.product.save()
+                
+            selected_address = Address.objects.get(pk=selected_address_id)
+            shipping_address = ShippingAddress.objects.create(
+                user=user,
+                name=selected_address.name,
+                house_name=selected_address.house_name,
+                phone=selected_address.phone,
+                post=selected_address.post,
+                city=selected_address.city,
+                pin_code=selected_address.pin_code,
+                state=selected_address.state
+            )
+            order.shipping_address = shipping_address
+            order.save()
+
+            Cart.objects.filter(user=user).delete()        
+
+            return redirect('ordersuccess')
+
+        return render(request, 'checkout.html')
+    return redirect('login')
+
+@login_required(login_url='/login/')    
 def orderSuccess(request):
     return render(request,'ordersuccess.html')   
 
 #user side order views
+@login_required(login_url='/login/')
 def viewOrders(request):
     user = request.user
     orders = Order.objects.filter(user=user).order_by('-id')
@@ -276,6 +298,7 @@ def viewOrders(request):
     context = {'orders': orders}
     return render(request, 'orders.html', context)
 
+@login_required(login_url='/login/')
 def orderDetails(request,order_id):
     user = request.user
     orders = Order.objects.filter(pk=order_id)
@@ -284,7 +307,7 @@ def orderDetails(request,order_id):
     return render(request,'orderdetails.html',context)
 
 
-
+@login_required(login_url='/login/')
 def invoicePdf(request, order_id):
     try:
         order = Order.objects.get(pk=order_id)
@@ -313,22 +336,22 @@ def invoicePdf(request, order_id):
 
     # User Details
     content.append(Paragraph("<h2>Customer Details:</h2>", normal_style))
-    if order.address:
-        content.append(Paragraph(f"<strong>Customer Name:</strong> {order.address.name}", normal_style))
-        content.append(Paragraph(f"<strong>Address:</strong> {order.address.house_name}, {order.address.city}, {order.address.pin_code}", normal_style))
-        content.append(Paragraph(f"<strong>Phone:</strong> {order.address.phone}", normal_style))
+    if order.shipping_address:
+        content.append(Paragraph(f"<strong>Customer Name:</strong> {order.shipping_address.name}", normal_style))
+        content.append(Paragraph(f"<strong>Address:</strong> {order.shipping_address.house_name}, {order.shipping_address.city}, {order.shipping_address.pin_code}", normal_style))
+        content.append(Paragraph(f"<strong>Phone:</strong> {order.shipping_address.phone}", normal_style))
     else:
         content.append(Paragraph("<strong>No address available for this order</strong>", normal_style))
     content.append(Paragraph("<br/><br/>", normal_style))  # Add space between sections
 
     # Invoice Details Table
     table_data = [
-        ["Date", "Order ID", "Product Name", "Quantity", "Price", "Discount", "Total"]
+        ["Date", "Order ID", "Product Name", "Quantity", "Price", "Total"]
     ]
 
     for order_item in order.orderitem_set.all():  # Access through the intermediate model
         product_name = order_item.product.name
-        product_price = order_item.product.price
+        product_price = order_item.price_at_order
         quantity = order_item.quantity
         total_amount = product_price * quantity
         
@@ -338,12 +361,13 @@ def invoicePdf(request, order_id):
             order.id,
             product_name,
             quantity,
-            f"{floatformat(product_price, -2)}",
-            f"{floatformat(order.discount_amount, -2)}",
+            f"{floatformat(product_price, -2)}",            
             f"{floatformat(total_amount, -2)}"
         ])
-
-    total_price_row = ["", "", "", "", "", "Total Price", f"Rs.{order.total_price}"]
+  
+    discount_row = ["", "", "", "", "Discount", f"-Rs.{order.discount_amount}"]
+    table_data.append(discount_row)
+    total_price_row = ["", "", "", "", "Total Price", f"Rs.{order.total_price}"]
     table_data.append(total_price_row)
 
     table_style = [
@@ -373,6 +397,7 @@ def invoicePdf(request, order_id):
 
     return response
 
+@login_required(login_url='/login/')
 def cancelOrder(request,item_id):
     item = OrderItem.objects.get(pk=item_id)
     if item.status != 'cancelled':  
@@ -391,7 +416,7 @@ def cancelOrder(request,item_id):
 
     return redirect('vieworders')
    
-
+@login_required(login_url='/login/')
 def requestReturn(request,item_id):
     item = OrderItem.objects.get(pk=item_id)
     if item.status == OrderItem.DELIVERED:

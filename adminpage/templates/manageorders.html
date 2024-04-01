@@ -88,10 +88,8 @@
                             <th>Order id</th>
                             <th>User</th>
                             <th>Product</th>                          
-                            <th>Quantity</th>
-                            <th>Payment</th>
-                            <th>Image</th>
-                            <th>Amount</th>
+                            <th>Quantity</th>                      
+                            <th>Image</th>                            
                             <th>Status</th>                           
                           </tr>
                         </thead>
@@ -101,10 +99,9 @@
                               <td>{{ order_item.order.id }}</td>
                               <td>{{ order_item.order.user.username }}</td>
                               <td>{{ order_item.product.name }}</td>
-                              <td>{{ order_item.quantity }}</td>
-                              <td>{{ order_item.order.payment_method }}</td>
+                              <td>{{ order_item.quantity }}</td>                              
                               <td><img src="{{ order_item.product.image.url }}" alt="Product Image" style="width: 50px; height: 50px;"></td>
-                              <td>{{ order_item.calculate_amount }}</td>
+                             
                               <td>
                                 {% if order_item.status == 'cancelled' %}
                                     Cancelled
@@ -129,9 +126,11 @@
                                     </form>
                                 {% endif %}
                             </td>
-                            
+                            <td>
+                              <a href="/userorders/{{ order_item.order.id }}">Details</a>
+                            </td>
                           </tr>
-                      {% endfor %}                                            
+                        {% endfor %}                                            
 
                         </tbody>
                       </table>

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import razorpay
 from django.http import JsonResponse,HttpResponse
-from decimal import Decimal
+from decimal import Decimal,ROUND_HALF_UP
 from django.views.decorators.cache import never_cache
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph,Table, TableStyle
@@ -242,7 +242,7 @@ def processOrder(request):
                 messages.error(request, "Please select an address.")
                 return redirect('checkout')         
             
-            total_price_with_discount = max(total_amount - discount_amount, Decimal('0'))
+            total_price_with_discount = Decimal(max(total_amount - discount_amount, Decimal('0')))
 
             wallet, created = Wallet.objects.get_or_create(user=user) 
 
@@ -398,15 +398,24 @@ def invoicePdf(request, order_id):
     return response
 
 @login_required(login_url='/login/')
-def cancelOrder(request,item_id):
+def cancelOrder(request, item_id):
     item = OrderItem.objects.get(pk=item_id)
     if item.status != 'cancelled':  
         item.status = 'cancelled'
         item.save()
 
-        if item.order.payment_method!='COD':
+        if item.order.payment_method != 'COD':
             user = item.order.user
-            cancelled_amount = Decimal(item.calculate_amount())
+            # Directly use the discount amount from the order
+            total_discount = item.order.discount_amount
+
+            # Calculate the proportional discount for each item
+            items_count = item.order.orderitem_set.count()
+            discount_per_item = total_discount / items_count
+
+            # Calculate the refund amount for the cancelled item
+            original_price = item.price_at_order # Use the price at the time of order
+            cancelled_amount = original_price - discount_per_item
 
             wallet, created = Wallet.objects.get_or_create(user=user)
             wallet.balance += cancelled_amount
@@ -415,6 +424,7 @@ def cancelOrder(request,item_id):
             messages.success(request, f'Amount of {cancelled_amount} added to your wallet.')
 
     return redirect('vieworders')
+
    
 @login_required(login_url='/login/')
 def requestReturn(request,item_id):

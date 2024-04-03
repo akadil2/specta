@@ -60,14 +60,12 @@ def viewWishlist(request):
         return render(request, 'wishlist.html', context)
     return redirect('login')
  
+def addtoWishlist(request, product_id):    
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            product = Product.objects.get(pk=product_id)
+            user = request.user
 
-
-def addtoWishlist(request, product_id):
-    if request.user.is_authenticated:
-        product = Product.objects.get(pk=product_id)
-        user = request.user
-
-        if request.method == 'POST':            
             if Wishlist.objects.filter(user=user, product=product).exists():
                 message = 'Product is already in the wishlist.'
             else:
@@ -75,12 +73,15 @@ def addtoWishlist(request, product_id):
                 message = 'Product added to the wishlist.'
 
             return JsonResponse({'message': message})
-        else:            
-            return JsonResponse({'error': 'Invalid request method.'}, status=400)
+        else:
+            return JsonResponse({'error': 'Please log in to add products to your wishlist.'}, status=401)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
-    messages.error(request, 'Please log in to add products to your wishlist.')
-    return redirect('login')
 
+    
+
+@login_required(login_url='/login/')
 def deleteWishlist(requst,product_id):
     item = Wishlist.objects.filter(pk=product_id).delete()
     return redirect('wishlist')

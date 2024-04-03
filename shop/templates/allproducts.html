@@ -108,7 +108,7 @@
 	</div>
 </div>
 </div>
-<script>
+<!-- <script>
     $(document).ready(function() {
         $(".wishlist-form").submit(function(event) {
             event.preventDefault();  // Prevent the default form submission
@@ -130,7 +130,37 @@
             });
         });
     });
+</script> -->
+<script>
+    $(document).ready(function() {
+        $(".wishlist-form").submit(function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            var form = $(this);
+
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(),
+                success: function(response) {
+                    // Handle the success response
+                    form.siblings(".wishlist-message-container").text(response.message);
+                },
+                error: function(xhr, status, error) {
+                    // Handle the error response
+                    if (xhr.status === 401) {
+                        // Unauthorized (user not authenticated)
+                        form.siblings(".wishlist-message-container").text("Please log in to add products to your wishlist.");
+                    } else {
+                        // Other errors
+                        console.log(error);
+                    }
+                }
+            });
+        });
+    });
 </script>
+
 
 {%endblock%}
 	<!-- end products -->

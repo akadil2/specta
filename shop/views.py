@@ -407,16 +407,14 @@ def cancelOrder(request, item_id):
 
         if item.order.payment_method != 'COD':
             user = item.order.user
-            # Directly use the discount amount from the order
             total_discount = item.order.discount_amount
 
-            # Calculate the proportional discount for each item
-            items_count = item.order.orderitem_set.count()
-            discount_per_item = total_discount / items_count
+            total_quantity = item.order.orderitem_set.aggregate(total_quantity=Sum('quantity'))['total_quantity']
 
-            # Calculate the refund amount for the cancelled item
-            original_price = item.price_at_order # Use the price at the time of order
-            cancelled_amount = original_price - discount_per_item
+            discount_per_item = total_discount / total_quantity
+            
+            original_price = item.price_at_order 
+            cancelled_amount = (original_price - discount_per_item) * item.quantity
 
             wallet, created = Wallet.objects.get_or_create(user=user)
             wallet.balance += cancelled_amount
